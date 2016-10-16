@@ -72,6 +72,11 @@ module.exports = function(app, User, Story) {
                 starred: user.starred.includes(story.shortID),
                 starcount: story.starcount
             });
-        });
+        }, function() {														// consider changing with a failRequest or a redirect to a 404
+			res.status(404);
+			res.render('404', {
+				title: "Page not found"
+			});
+		});
     });
 };
