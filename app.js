@@ -8,7 +8,8 @@ var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
-var User = require('./models/user.js');
+var User = require('./models/User.js');
+var Story = require('./models/Story.js');
 
 var app = express();
 
@@ -25,7 +26,7 @@ app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./routes/index')(app);
+require('./routes/index')(app, User, Story);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

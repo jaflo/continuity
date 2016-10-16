@@ -1,4 +1,4 @@
-module.exports = function(app) {
-    require("./main.js")(app);
+module.exports = function(app, User, Story) {
+    require("./main.js")(app, User, Story);
     require("./user.js")(app);
 };
