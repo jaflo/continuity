@@ -5,11 +5,12 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
 
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
-var User = require('./models/User.js');
-var Story = require('./models/Story.js');
 
 var app = express();
 
@@ -26,7 +27,8 @@ app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./routes/index')(app, User, Story);
+// all routes
+require('./routes/main')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

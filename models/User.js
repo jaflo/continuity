@@ -48,7 +48,7 @@ var userSchema = mongoose.Schema({
 			unique: false
 		}
 	}],
-	incompletestoried: [{
+	incompletestories: [{
 		parent: {
 			type: String,
 			unique: true

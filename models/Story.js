@@ -22,7 +22,6 @@ var storySchema = mongoose.Schema({
 			unique: false
 		}
 	},
-
 	content: {
 		type: String,
 		required: true,
@@ -30,7 +29,6 @@ var storySchema = mongoose.Schema({
 			unique: false
 		}
 	},
-
 	createdat: {
 		type: Date,
 		required: true,
