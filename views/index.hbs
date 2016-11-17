@@ -1,2 +1,27 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<div id="story">
+	<div class="master piece">
+		<div class="options">
+			<a href="/user/1" class="author">
+				<i>😀</i>
+				<span>by Username</span>
+			</a>
+			<a href="/abc123/star" class="star">
+				<i>⭐</i>
+				<span>star</span>
+			</a>
+			<a href="/abc123" class="rewind">
+				<i>⏪</i>
+				<span>rewind</span>
+			</a>
+		</div>
+		<div class="content">Vestibulum maximus molestie orci, et mollis nisl rhoncus quis. Mauris hendrerit porta pellentesque. Morbi a fringilla erat, eget blandit sapien. Maecenas nec sem porttitor, eleifend sapien id, aliquet massa. Vestibulum rhoncus sollicitudin sapien nec placerat. Etiam odio tortor, viverra vitae quam ut, lacinia tristique turpis. Vivamus eu lacus sed lectus viverra pulvinar ullamcorper vitae enim.</div>
+	</div>
+</div>
+<form action="/append" id="next">
+	<input type="hidden" name="insertafter" />
+	<textarea name="text" id="" cols="30" rows="5" placeholder="Write your own continuation"></textarea>
+	<button type="submit">
+		<span class="continue">or read someone else's continuation</span>
+		<span class="write">submit your continuation</span>
+	</button>
+</form>
