@@ -4,25 +4,50 @@ $("#next textarea").on("change keyup keydown keypress", function() {
 
 $("#next").submit(function(e) {
 	if ($("#next textarea").val().length > 0) {
-		// do fancy AJAX and render the new piece
+		$.post("/create", $("#next").serialize(), function(data) {
+			if (data.status == "failed") {
+				alert("Failed to create: "+data.message);
+			} else {
+				renderPiece({
+					id: "abc123",
+					content: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate.",
+					author: {
+						id: "1",
+						display: "Bob",
+						emoji: "😀"
+					},
+					created: "timestamp",
+					starred: false
+				});
+			}
+		}, "json");
 	} else {
-		e.preventDefault();
-		renderPiece({
-			id: "abc123",
-			content: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate.",
-			author: {
-				id: "1",
-				display: "Bob",
-				emoji: "😀"
-			},
-			created: "timestamp",
-			starred: false
-		});
+		$.get("/next", {
+			parent: currentID
+		}, function(data) {
+			if (data.status == "failed") {
+				alert("Failed to load: "+data.message);
+			} else {
+				renderPiece({
+					id: "abc123",
+					content: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate.",
+					author: {
+						id: "1",
+						display: "Bob",
+						emoji: "😀"
+					},
+					created: "timestamp",
+					starred: false
+				});
+			}
+		}, "json");
 	}
+	e.preventDefault();
 });
 
 var hasSeenNewest = true,
-	historyManipulated = false;
+	historyManipulated = false,
+	currentID = "00000";
 
 $(window).scroll(function() {
 	var win = $(window);
@@ -38,9 +63,16 @@ function renderPiece(piece) {
 	snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 	snippet.find(".author").find("span").text("by "+piece.author.display);
 	var staraction = piece.starred ? "unstar" : "star";
-	snippet.find(".star").attr("href", "/"+piece.id+"/"+staraction).click(function() {
-		var action = $(this).attr("href");
-		// AJAX here
+	snippet.find(".star").attr("href", "/"+staraction).click(function() {
+		$.post($(this).attr("href"), {
+			id: $(this).attr("id").replace("piece", "")
+		}, function(data) {
+			if (data.status == "failed") {
+				alert("Failed to create: "+data.message);
+			} else {
+				alert("Woooo!");
+			}
+		}, "json");
 		return false;
 	}).find("span").text(staraction);
 	snippet.find(".rewind").attr("href", "/"+piece.id).click(function() {
@@ -68,6 +100,7 @@ function renderPiece(piece) {
 }
 
 function updateAddress(id) {
+	currentID = id;
 	if (historyManipulated) {
 		history.replaceState({}, id, "/"+id);
 	} else {

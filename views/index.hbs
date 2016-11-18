@@ -16,18 +16,18 @@
 		</div>
 		<div class="content"></div>
 	</div>
-	{{#each story}}
-	<div class="piece" id="piece{{id}}">
+	{{#each stories}}
+	<div class="piece" id="piece{{shortID}}">
 		<div class="options">
 			<a href="/user/{{author.id}}" class="author">
 				<i>{{author.emoji}}</i>
 				<span>by {{author.display}}</span>
 			</a>
-			<a href="/{{id}}/star" class="star">
+			<a href="/star" class="star">
 				<i>⭐</i>
 				<span>{{#if starred}}un{{/if}}star</span>
 			</a>
-			<a href="/{{id}}" class="rewind">
+			<a href="/{{shortID}}" class="rewind">
 				<i>⏪</i>
 				<span>rewind</span>
 			</a>
@@ -37,8 +37,8 @@
 	{{/each}}
 </div>
 <form action="/continue" id="next">
-	<input type="hidden" name="insertafter" value="{{currentID}}" />
-	<textarea name="text" cols="30" rows="5" placeholder="Write your own continuation"></textarea>
+	<input type="hidden" name="parent" value="{{currentID}}" />
+	<textarea name="content" cols="30" rows="5" placeholder="Write your own continuation"></textarea>
 	<button type="submit" class="primary">
 		<span class="continue">or read someone else's continuation</span>
 		<span class="write">submit your continuation</span>
