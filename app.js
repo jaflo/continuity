@@ -11,7 +11,6 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
 var User = require('./models/user.js');
@@ -83,6 +82,7 @@ Story.collection.count({}, function(err, count) {
 			//console.dir(parentStory);
 		});
 		console.log("Save successful");
+		process.emit("initialized");
 	}
 });
 
