@@ -13,31 +13,32 @@ module.exports = function(passport, LocalStrategy) {
 	});
 
 	passport.use('local-signup', new LocalStrategy({
-		usernameField: 'username',
+		usernameField: 'email',
 		passwordField: 'password',
 		passReqToCallback: true // allows us to pass back the entire request to the callback
-	}, function(req, username, password, done) {
+	}, function(req, email, password, done) {
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
 		process.nextTick(function() {
 			User.findOne({
-				'username': username
+				'email': email
 			}).exec().then(function(err, user) {
 				if (user) {
 					return done(null, false, req.flash('error', 'That username is already taken'));
 				} else {
-					var newUser = new User();
+					var myRegexp = /(.+?)@/g;
+					var match = myRegexp.exec(email);
+					var username = match[0];
 
+					var newUser = new User();
 					newUser.username = username;
 					newUser.password = newUser.generateHash(password);
-					newUser.email = req.body.email;
+					newUser.email = email;
 					newUser.createdat = Date.now();
 					newUser.changedat = Date.now();
 
 					newUser.save(function(err) {
-						if (err && err.code === 11000) {
-							return done(null, false, req.flash('error', 'That email is already taken'));
-						} else if (err) {
+						if (err) {
 							throw err;
 						}
 						return done(null, newUser);
@@ -51,12 +52,12 @@ module.exports = function(passport, LocalStrategy) {
 	}));
 
 	passport.use('local-login', new LocalStrategy({
-		usernameField: 'username', // by default, local strategy uses username and password, we will override with username ( :D )
+		usernameField: 'email', // by default, local strategy uses username and password, we will override with email
 		passwordField: 'password',
 		passReqToCallback: true // allows us to pass back the entire request to the callback
 	}, function(req, username, password, done) { // callback with username and password from our form
 		User.findOne({
-			'username': username
+			'email': username
 		}, function(err, user) {
 			if (err) {
 				return done(err);

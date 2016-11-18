@@ -1,9 +1,10 @@
 var User = require('../models/user.js');
 var Story = require('../models/story.js');
+var tools = require('../config/tools.js');
 
 module.exports = function(app) {
     app.get('/', function(req, res, next) {
-		load(0, function(stories, story) {
+		load(req, res, '00000', function(stories, story) {
 			res.render('index', {
 				bodyclass: "longer",
 				story: stories,
@@ -18,16 +19,18 @@ module.exports = function(app) {
     });
 
     app.get('/:id', function(req, res) {
-        var arrayofstories = req.user.incompletestories;                                // find incomplete text from previous session
-        var incompletestory;
-        for(var i = 0; i < arrayofstories.length; i++) {
-            var element = arrayofstories[i];
-            if(element.parent == req.params.id) {
-                incompletestory = element.text;
-                i = arrayofstories.length;
-            }
-        }
-        load(req, req.params.id, function(stories, story) {                             // TODO: Learn if req.user updates continuously, or if we will need to use mongoose to get most current version
+		var incompletestory;
+		if(req.user) {
+	        var arrayofstories = req.user.incompletestories;							// find incomplete text from previous session
+	        for(var i = 0; i < arrayofstories.length; i++) {
+	            var element = arrayofstories[i];
+	            if(element.parent == req.params.id) {
+	                incompletestory = element.text;
+	                i = arrayofstories.length;
+	            }
+	        }
+		}
+        load(req, res, req.params.id, function(stories, story) { // TODO: Learn if req.user updates continuously, or if we will need to use mongoose to get most current version
             res.render('index', {
                 bodyclass: "longer",
                 story: stories,
@@ -40,11 +43,6 @@ module.exports = function(app) {
                 starcount: story.starcount,
                 incompletestory: incompletestory
             });
-        }, function() {			// consider changing with a failRequest or a redirect to a 404
-            res.status(404);
-            res.render('404', {
-                title: "Page not found"
-            });
         });
     });
 };
@@ -52,7 +50,7 @@ module.exports = function(app) {
 // methods
 
 function getParentStory(req, newStory, storyArray, callback, render) {		//recursively moves up story lineage up to story 0
-	if (newStory.shortID != '0') {
+	if (newStory.shortID != '00000') {
 		newStory = newStory.toObject();
 		newStory["starred"] = req.user && req.user.starred.includes(story.shortID);
 		storyArray.unshift(newStory);
@@ -72,7 +70,7 @@ function getParentStory(req, newStory, storyArray, callback, render) {		//recurs
 	}
 }
 
-function load(req, shortID, complete, fail) {								// finds lineage of story
+function load(req, res, shortID, complete) {							// finds lineage of story
 	Story.findOne({                                                         // find initial story
 		shortID: shortID
 	}).exec().then(function(story) {
@@ -89,20 +87,16 @@ function load(req, shortID, complete, fail) {								// finds lineage of story
 						story = story.toObject();                                           // convert mongoose doc to object
 						story.siblings = siblingCount;
 						complete(stories, story);
-					}).catch(function(err) {                                                // error catching
-						console.log('ERROR: Could not find siblings of story ' + story.shortID);
 					});
 				});
-			}).catch(function(err) {
-				console.log('ERROR: Unable to update story ' + story.shortID);
 			});
 		} else {
 			console.log('ERROR: Story with shortID ' + shortID + ' not found');
-			fail();
+			res.redirect("/");
 		}
 	}).catch(function(err) {
 		console.log('ERROR: Story with shortID ' + shortID + ' not found');
-		fail();
+		tools.failRequest(req, res, "Internal Error: Unable to search database");
 	});
 }
 
