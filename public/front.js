@@ -4,6 +4,7 @@ $("#next textarea").on("change keyup keydown keypress", function() {
 
 $("#next").submit(function(e) {
 	if ($("#next textarea").val().length > 0) {
+		console.log($("#next").serialize());
 		$.post("/create", $("#next").serialize(), function(data) {
 			if (data.status == "failed") {
 				alert("Failed to create: "+data.message);

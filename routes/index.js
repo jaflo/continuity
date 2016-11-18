@@ -14,7 +14,7 @@ module.exports = function(app) {
 					display: lastStory.username,
 					emoji: lastStory.emoji
 				},
-				shortID: story.shortID,
+				currentID: story.shortID,
 				content: story.content,
 				date: timeSince(story.changedat),
 				ISO8601: story.changedat.toISOString(),
