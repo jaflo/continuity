@@ -7,7 +7,7 @@ module.exports = function(app) {
 		failureRedirect: '/login', // redirect back to the signup page if there is an error
 		failureFlash: true // allow flash messages
 	}));
-	
+
 	app.get('/login', function(req, res, next) {
 		res.render('login');
     });
@@ -17,7 +17,6 @@ module.exports = function(app) {
 		req.assert('password', 'Passwords must be at least 6 characters long').isLength({min: 6, max: undefined});
 		req.assert('username', 'Please enter a username').notEmpty();
 		req.assert('username', 'Usernames cannot exceed 32 characters').isLength({min: 1, max: 32});
-		req.assert('username', 'Usernames cannot contain whitespace').notRegex(/\s/);
 		req.assert('email', 'Please enter an email').notEmpty();
 		req.assert('email', 'Emails cannot exceed 500 characters').isLength({min: 1, max: 500});
 		req.assert('email', 'Emails must be vaild').isEmail();
@@ -33,7 +32,7 @@ module.exports = function(app) {
 			tools.failRequest(req, res, errors);
 		}
 	});
-	
+
 	app.get('/signup', function(req, res, next) {
 		res.render('signup');
     });

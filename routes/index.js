@@ -5,19 +5,27 @@ var tools = require('../config/tools.js');
 module.exports = function(app) {
     app.get('/', function(req, res, next) {
 		load(req, res, '00000', function(stories, story) {
+			var lastStory = stories[stories.length-1];
 			res.render('index', {
 				bodyclass: "longer",
-				story: stories,
+				stories: stories,
+				author: {
+					id: story.id,
+					display: lastStory.username,
+					emoji: lastStory.emoji
+				},
+				shortID: story.shortID,
+				content: story.content,
 				date: timeSince(story.changedat),
 				ISO8601: story.changedat.toISOString(),
 				views: story.views,
-				siblings: story.siblings,
 				starred: false
 			});
 		});
     });
 
-    app.get('/:id', function(req, res) {
+    app.get('/:id', function(req, res, next) {
+		if(req.params.id.length !== 5) { next(); }
 		var incompletestory;
 		if(req.user) {
 	        var arrayofstories = req.user.incompletestories;							// find incomplete text from previous session
@@ -37,7 +45,6 @@ module.exports = function(app) {
                 date: timeSince(story.changedat),
                 ISO8601: story.changedat.toISOString(),
                 views: story.views,
-                siblings: story.siblings,
                 starred: req.user && req.user.starred.includes(story.shortID),
                 starcount: story.starcount,
                 incompletestory: incompletestory
@@ -52,11 +59,24 @@ function getParentStory(req, newStory, storyArray, callback, render) {		//recurs
 	if (newStory.shortID != '00000') {
 		newStory = newStory.toObject();
 		newStory["starred"] = req.user && req.user.starred.includes(story.shortID);
-		storyArray.unshift(newStory);
 		Story.findOne({
 			shortID: newStory.parent
 		}).exec()
 		.then(function(newParentStory) {
+			User.findOne({email: story.author}).exec()
+			.then(function(user) {
+				return [newParentStory, user];
+			});
+		})
+		.then(function(arr) {
+			var newParentStory = arr[0];
+			var user = arr[1];
+			newStory.author = {
+				id: user.id,
+				display: user.username,
+				emoji: user.emoji
+			};
+			storyArray.unshift(newStory);
 			callback(req, newParentStory, storyArray, callback, render);
 		}).catch(function(err) {
 			console.log('ERROR: Parent story could not be found');
@@ -64,12 +84,17 @@ function getParentStory(req, newStory, storyArray, callback, render) {		//recurs
 	} else {
 		newStory.toObject();
 		newStory["starred"] = req.user && req.user.starred.includes(story.shortID);
+		newStory.author = {
+			id: '1',
+			display: 'ejmejm',
+			emoji: "😀"
+		};
 		storyArray.unshift(newStory);
 		render();
 	}
 }
 
-function load(req, res, shortID, complete) {							// finds lineage of story
+function load(req, res, shortID, complete) {								// finds lineage of story
 	Story.findOne({                                                         // find initial story
 		shortID: shortID
 	}).exec().then(function(story) {
@@ -78,15 +103,9 @@ function load(req, res, shortID, complete) {							// finds lineage of story
 			.then(function(st) {
 				var stories = [];
 				var newStory = story;
-				getParentStory(req, newStory, stories, getParentStory, function() {         // get an array for the lineage -- getParentStory(req, newStory, storyArray, callback, render);
-					Story.count({                                                           // then, find the sibling count
-						parent: story.parent
-					}).exec()
-					.then(function(siblingCount) {
-						story = story.toObject();                                           // convert mongoose doc to object
-						story.siblings = siblingCount;
-						complete(stories, story);
-					});
+				getParentStory(req, newStory, stories, getParentStory, function() {			// get an array for the lineage -- getParentStory(req, newStory, storyArray, callback, render);
+					story = story.toObject();												// convert mongoose doc to object
+					complete(stories, story);
 				});
 			});
 		} else {

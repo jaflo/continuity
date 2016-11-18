@@ -4,30 +4,22 @@ var storySchema = mongoose.Schema({
 	shortID: {
 		type: String,
 		required: true,
-		index: {
-			unique: true
-		}
+		unique: true
 	},
 	parent: {
 		type: String,
 		required: true,
-		index: {
-			unique: false
-		}
+		unique: false
 	},
 	author: {
 		type: String,
 		required: true,
-		index: {
-			unique: false
-		}
+		unique: false
 	},
 	content: {
 		type: String,
 		required: true,
-		index: {
-			unique: false
-		}
+		unique: false
 	},
 	createdat: {
 		type: Date,

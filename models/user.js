@@ -4,11 +4,17 @@ var bcrypt = require('bcryptjs');
 var SALT_LEVEL = 10;
 
 var userSchema = mongoose.Schema({
-    username: {
+	username: {
         type: String,
         required: true,
         unique: false,
         maxlength: 32
+    },
+	emoji: {
+        type: String,
+        required: true,
+		default: "😀",
+        unique: false
     },
     email: {
         type: String,

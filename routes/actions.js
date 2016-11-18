@@ -87,7 +87,7 @@ function attemptCreation(req, res, shortID) {
 			var newStory = new Story({
 				shortID: shortID,
 				parent: req.body.parent,
-				author: req.user.username,
+				author: req.user.email,
 				content: req.body.content,
 				createdat: Date.now(),
 				changedat: Date.now()
