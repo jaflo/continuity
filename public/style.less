@@ -47,6 +47,14 @@ textarea, input, button {
 	}
 }
 
+a {
+	border-bottom: 1px solid;
+	text-decoration: none;
+	&:hover {
+		border-bottom-width: 2px;
+	}
+}
+
 header, main, footer {
 	max-width: 30em;
 	margin: auto;
@@ -55,19 +63,21 @@ header, main, footer {
 header {
 	text-align: center;
 	padding-top: 1em;
+	margin-bottom: 1em;
 }
 
 h1 {
 	font-family: sans-serif;
-	font-size: 1.5em;
+	font-size: 1.7em;
 	margin: 0;
 	a {
 		color: black;
 		text-decoration: none;
+		border-bottom-width: 0;
 	}
 }
 
-#login {
+#user {
 	padding-top: @pad;
 }
 
@@ -75,8 +85,20 @@ h1 {
 	overflow-x: scroll;
 }
 
+#login, #signup {
+	text-align: center;
+	label {
+		display: block;
+		padding: @pad;
+		margin-bottom: -2em;
+		text-align: left;
+	}
+	input {
+		padding-top: 2em;
+	}
+}
+
 #story {
-	margin-top: 1em;
 	.transition;
 	.piece {
 		position: relative;
@@ -97,6 +119,7 @@ h1 {
 				.transition;
 				position: relative;
 				color: @maintextcolor;
+				border: none;
 				i {
 					position: relative;
 					z-index: 2;
@@ -152,7 +175,7 @@ h1 {
 				opacity: 1;
 			}
 			.content {
-				opacity: 0.7;
+				opacity: 0.4;
 			}
 		}
 	}
@@ -165,8 +188,6 @@ h1 {
 	padding-top: 1em;
 	button {
 		position: relative;
-		color: white;
-		background: purple;
 		span {
 			.transition;
 		}
@@ -190,6 +211,11 @@ h1 {
 			}
 		}
 	}
+}
+
+button.primary {
+	color: white;
+	background: purple;
 }
 
 footer {

@@ -7,6 +7,10 @@ module.exports = function(app) {
 		failureRedirect: '/login', // redirect back to the signup page if there is an error
 		failureFlash: true // allow flash messages
 	}));
+	
+	app.get('/login', function(req, res, next) {
+		res.render('login');
+    });
 
 	app.post('/signup', function(req, res) {
 		req.assert('password', 'Passwords must match').equals('reentered');
@@ -29,4 +33,8 @@ module.exports = function(app) {
 			tools.failRequest(req, res, errors);
 		}
 	});
+	
+	app.get('/signup', function(req, res, next) {
+		res.render('signup');
+    });
 };
