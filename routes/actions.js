@@ -61,8 +61,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/create', function(req, res) {
+		console.log(req.body);
 		req.assert('parent', 'A parent story is required!').notEmpty();
-		req.assert('content', 'Please write something').notRegex(/^[\s\n]*$/);
+		req.assert('content', 'Please write something').notEmpty();
 		var errors = req.validationErrors();
 		if(errors) {
 			tools.failRequest(req, res, errors);

@@ -24,14 +24,11 @@ module.exports = function(passport, LocalStrategy) {
 				'email': email
 			}).exec().then(function(err, user) {
 				if (user) {
+					console.log('User already exists!')
 					return done(null, false, req.flash('error', 'That username is already taken'));
 				} else {
-					var myRegexp = /(.+?)@/g;
-					var match = myRegexp.exec(email);
-					var username = match[0];
-
 					var newUser = new User();
-					newUser.username = username;
+					newUser.username = req.body.username;
 					newUser.password = newUser.generateHash(password);
 					newUser.email = email;
 					newUser.createdat = Date.now();
@@ -46,6 +43,8 @@ module.exports = function(passport, LocalStrategy) {
 				}
 			})
 			.catch(function(err) {
+				console.log('Error!');
+				console.log(err);
 				return done(err);
 			});
 		});

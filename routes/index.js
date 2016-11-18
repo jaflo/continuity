@@ -58,7 +58,7 @@ module.exports = function(app) {
 function getParentStory(req, newStory, storyArray, callback, render) {		//recursively moves up story lineage up to story 0
 	if (newStory.shortID != '00000') {
 		newStory = newStory.toObject();
-		newStory["starred"] = req.user && req.user.starred.includes(story.shortID);
+		newStory["starred"] = req.user && req.user.starred.includes(newStory.shortID);
 		Story.findOne({
 			shortID: newStory.parent
 		}).exec()
@@ -83,7 +83,7 @@ function getParentStory(req, newStory, storyArray, callback, render) {		//recurs
 		});
 	} else {
 		newStory.toObject();
-		newStory["starred"] = req.user && req.user.starred.includes(story.shortID);
+		newStory["starred"] = req.user && req.user.starred.includes(newStory.shortID);
 		newStory.author = {
 			id: '1',
 			display: 'ejmejm',
