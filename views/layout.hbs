@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Continuity{{#if currentID}}:{{currentID}}{{/if}}</title>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+	<title>Continuity{{#if currentID}}:{{currentID}}{{/if}}</title>
+	<link rel="stylesheet" href="/style.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
 </head>
 <body>
 <header>
-    <h1><a href="/">Continuity</a>{{#if currentID}}:<a href="/{{currentID}}">{{currentID}}</a>{{/if}}</h1>
-    {{#if user}}
-    <div id="user" class="loggedin">
-        Welcome back <a href="/user/2">{{user.username}}</a>! {{user.emoji}}
-    </div>
-    {{else}}
-    <form id="login" action="/login" method="post">
-        <input type="email" placeholder="email" />
-        <input type="password" placeholder="password" />
-        <button type="submit">log in or sign up</button>
-    </form>
-    {{/if}}
+	<h1><a href="/">Continuity</a>{{#if currentID}}:<a href="/{{currentID}}">{{currentID}}</a>{{/if}}</h1>
+	{{#if user}}
+	<div id="user" class="loggedin">
+		Welcome back <a href="/user/2">{{user.username}}</a>! {{user.emoji}}
+	</div>
+	{{else}}
+	<form id="login" action="/login" method="post">
+		<input type="email" placeholder="email" />
+		<input type="password" placeholder="password" />
+		<button type="submit">log in or sign up</button>
+	</form>
+	{{/if}}
 </header>
 <main>
-    {{{body}}}
+	{{{body}}}
 </main>
 <footer>
-    &copy; 2016 &ndash; all continuations belong to their respective authors
+	&copy; 2016 &ndash; all continuations belong to their respective authors
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="/front.js"></script>

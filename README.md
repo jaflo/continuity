@@ -12,4 +12,4 @@ Production server:
     npm install --production
     npm start
 
-Travis runs tests in `/tests` using mocha.
+Travis runs tests in `/test` using mocha.
