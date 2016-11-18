@@ -8,7 +8,6 @@ module.exports = function(app) {
 			res.render('index', {
 				bodyclass: "longer",
 				story: stories,
-				currentID: story.shortID,
 				date: timeSince(story.changedat),
 				ISO8601: story.changedat.toISOString(),
 				views: story.views,

@@ -8,14 +8,17 @@
 <body>
 <header>
     <h1><a href="/">Continuity</a>{{#if currentID}}:<a href="/{{currentID}}">{{currentID}}</a>{{/if}}</h1>
+    {{#if user}}
     <div id="user" class="loggedin">
-        Welcome back <a href="/user/2">username</a>! 😀
+        Welcome back <a href="/user/2">{{user.username}}</a>! {{user.emoji}}
     </div>
+    {{else}}
     <form id="login" action="/login" method="post">
         <input type="email" placeholder="email" />
         <input type="password" placeholder="password" />
         <button type="submit">log in or sign up</button>
     </form>
+    {{/if}}
 </header>
 <main>
     {{{body}}}
