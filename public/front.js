@@ -9,17 +9,7 @@ $("#next").submit(function(e) {
 			if (data.status == "failed") {
 				alert("Failed to create: "+data.message);
 			} else {
-				renderPiece({
-					id: "abc123",
-					content: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate.",
-					author: {
-						id: "1",
-						display: "Bob",
-						emoji: "😀"
-					},
-					created: "timestamp",
-					starred: false
-				});
+				renderPiece(data.message);
 			}
 		}, "json");
 	} else {
@@ -29,17 +19,7 @@ $("#next").submit(function(e) {
 			if (data.status == "failed") {
 				alert("Failed to load: "+data.message);
 			} else {
-				renderPiece({
-					id: "abc123",
-					content: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate.",
-					author: {
-						id: "1",
-						display: "Bob",
-						emoji: "😀"
-					},
-					created: "timestamp",
-					starred: false
-				});
+				renderPiece(data.message);
 			}
 		}, "json");
 	}

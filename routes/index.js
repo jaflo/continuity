@@ -7,19 +7,8 @@ module.exports = function(app) {
 		load(req, res, '00000', function(stories, story) {
 			var lastStory = stories[stories.length-1];
 			res.render('index', {
-				bodyclass: "longer",
 				stories: stories,
-				author: {
-					id: story.id,
-					display: lastStory.username,
-					emoji: lastStory.emoji
-				},
-				currentID: story.shortID,
-				content: story.content,
-				date: timeSince(story.changedat),
-				ISO8601: story.changedat.toISOString(),
-				views: story.views,
-				starred: false
+				currentID: story.shortID
 			});
 		});
     });
@@ -41,19 +30,8 @@ module.exports = function(app) {
         load(req, res, req.params.id, function(stories, story) { // TODO: Learn if req.user updates continuously, or if we will need to use mongoose to get most current version
 			var lastStory = stories[stories.length-1];
 			res.render('index', {
-				bodyclass: "longer",
 				stories: stories,
-				author: {
-					id: story.id,
-					display: lastStory.username,
-					emoji: lastStory.emoji
-				},
-				currentID: story.shortID,
-				content: story.content,
-				date: timeSince(story.changedat),
-				ISO8601: story.changedat.toISOString(),
-				views: story.views,
-				starred: false
+				currentID: story.shortID
 			});
         });
     });
