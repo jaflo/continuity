@@ -19,7 +19,7 @@ module.exports = function(app) {
 
 
 	app.post('/signup', function(req, res) {
-		req.assert('password', 'Passwords must match').equals('reentered');
+		req.assert('password', 'Passwords must match').equals(req.body.reentered);
 		req.assert('password', 'Passwords must be at least 6 characters long').isLength({min: 6, max: undefined});
 		req.assert('username', 'Please enter a username').notEmpty();
 		req.assert('username', 'Usernames cannot exceed 32 characters').isLength({min: undefined, max: 32});
