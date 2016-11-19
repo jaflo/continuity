@@ -19,6 +19,20 @@
 	{{/if}}
 </header>
 <main>
+	{{#if success}}
+		<div class="alert success">
+			<ul>
+				{{#each success}}<li>{{this}}</li>{{/each}}
+			</ul>
+		</div>
+	{{/if}}
+	{{#if error}}
+		<div class="alert error">
+			<ul>
+				{{#each error}}<li>{{this}}</li>{{/each}}
+			</ul>
+		</div>
+	{{/if}}
 	{{{body}}}
 </main>
 <footer>
