@@ -10,8 +10,10 @@ module.exports = function(app) {
 		if(errors) {
 			tools.failRequest(req, res, 'No parent story!');
 		} else {
-			User.find({parent: req.query.parent}).exec()
+			console.log(req.query.parent);
+			Story.find({parent: req.query.parent}).exec()
 			.then(function(stories) {
+				console.log(stories);
 				if(stories.length == 0) {
 					tools.failRequest(req, res, 'No more stories left');
 				}
@@ -44,7 +46,7 @@ module.exports = function(app) {
 	});
 
 	app.post('/unstar', function(req, res) {
-		if(!(req.user || req.params.id)) { res.redirect("back"); }									// TODO: do better validation
+		if(!(req.user || req.params.id)) { res.redirect("back"); } // TODO: do better validation
 		Story.findOneAndUpdate({shortID: req.params.id}, {$dec: {starcount: 1}}).exec()
 		.then(function(status) {
 			return User.findOneAndUpdate({_id: req.user._id}, {$pull: {starred: req.params.id}})
@@ -61,19 +63,22 @@ module.exports = function(app) {
 	});
 
 	app.post('/create', function(req, res) {
-		console.log(req.body);
-		req.assert('parent', 'A parent story is required!').notEmpty();
-		req.assert('content', 'Please write something').notEmpty();
-		var errors = req.validationErrors();
-		if(errors) {
-			tools.failRequest(req, res, errors);
-		}
-		else {
-			attemptCreation(req, res, randomString(ID_LENGTH));
+		if(!req.user) {
+			tools.failRequest(req, res, "Please log in!")
+		} else {
+			req.assert('parent', 'A parent story is required!').notEmpty();
+			req.assert('content', 'Please write something').notEmpty();
+			var errors = req.validationErrors();
+			if(errors) {
+				tools.failRequest(req, res, errors);
+			}
+			else {
+				attemptCreation(req, res, randomString(ID_LENGTH));
+			}
 		}
 	});
 
-	app.post('/flag', function(req, res) {															// TODO
+	app.post('/flag', function(req, res) { // TODO
 		console.log("Unimplemented!");
 		res.redirect("back");
 	});
