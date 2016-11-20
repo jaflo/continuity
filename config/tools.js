@@ -1,5 +1,10 @@
 module.exports = {
 	completeRequest: function(req, res, data, redirect, success) {
+		console.log({
+			status: "success",
+			message: success,
+			data: data || false
+		});
 		if (req.xhr) {
 			res.json({
 				status: "success",

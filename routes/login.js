@@ -19,13 +19,13 @@ module.exports = function(app) {
 
 
 	app.post('/signup', function(req, res) {
-		req.assert('password', 'Passwords must match').equals(req.body.reentered);
-		req.assert('password', 'Passwords must be at least 6 characters long').isLength({min: 6, max: undefined});
+		//req.assert('password', 'Passwords must match').equals(req.body.reentered);
+		//req.assert('password', 'Passwords must be at least 6 characters long').isLength({min: 6, max: undefined});
 		req.assert('username', 'Please enter a username').notEmpty();
 		req.assert('username', 'Usernames cannot exceed 32 characters').isLength({min: undefined, max: 32});
 		req.assert('email', 'Please enter an email').notEmpty();
 		req.assert('email', 'Emails cannot exceed 500 characters').isLength({min: undefined, max: 500});
-		req.assert('email', 'Emails must be vaild').isEmail();
+		//req.assert('email', 'Emails must be vaild').isEmail();
 		var errors = req.validationErrors();
 		if(!errors) {
 			passport.authenticate('local-signup', {

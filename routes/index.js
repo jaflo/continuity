@@ -47,7 +47,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 			shortID: newStory.parent
 		}).exec()
 		.then(function(newParentStory) {
-			User.findOne({email: story.author}).exec()
+			return User.findOne({email: newStory.author}).exec()
 			.then(function(user) {
 				return [newParentStory, user];
 			});
@@ -64,6 +64,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 			callback(req, newParentStory, storyArray, callback, render);
 		}).catch(function(err) {
 			console.log('ERROR: Parent story could not be found');
+			console.log(err);
 		});
 	} else {
 		newStory = newStory.toObject();

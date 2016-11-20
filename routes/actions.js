@@ -10,16 +10,23 @@ module.exports = function(app) {
 		if(errors) {
 			tools.failRequest(req, res, 'No parent story!');
 		} else {
-			console.log(req.query.parent);
 			Story.find({parent: req.query.parent}).exec()
 			.then(function(stories) {
-				console.log(stories);
 				if(stories.length == 0) {
 					tools.failRequest(req, res, 'No more stories left');
 				}
 				else {
-					var index = Math.floor(Math.random()*stories.length);
-					tools.completeRequest(req, res, null, '/' + stories[index].shortID, null);
+					var story = stories[Math.floor(Math.random()*stories.length)];
+					User.findOne({email: story.author}).exec()
+					.then(function(user) {
+						story = story.toObject();
+						story["author"] = {
+							id: user.id,
+							display: user.username,
+							emoji: user.emoji
+						};
+						tools.completeRequest(req, res, story, '/' + story.shortID, "Successfully retrieved story");
+					});
 				}
 			})
 			.catch(function(err) {
@@ -102,6 +109,11 @@ function attemptCreation(req, res, shortID) {
 				if(error) { tools.failRequest(req, res, "Internal Error: Unable to create story"); }
 				var newObject = newStory.toObject();
 				newObject["starred"] = false;
+				newObject["author"] = {
+					id: req.user.id,
+					display: req.user.username,
+					emoji: req.user.emoji
+				};
 				tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
 			});
 		}
