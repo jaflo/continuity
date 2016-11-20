@@ -4,22 +4,24 @@ $("#next textarea").on("change keyup keydown keypress", function() {
 
 $("#next").submit(function(e) {
 	if ($("#next textarea").val().length > 0) {
-		console.log($("#next").serialize());
 		$.post("/create", $("#next").serialize(), function(data) {
+			$("#next textarea, #next button").removeAttr("disabled");
 			if (data.status == "failed") {
-				alert("Failed to create: "+data.message);
+				message(data.message, "Failed to create");
 			} else {
-				renderPiece(data.message);
+				$("#next textarea").val("");
+				renderPiece(data.data);
 			}
 		}, "json");
+		$("#next textarea, #next button").attr("disabled", "disabled");
 	} else {
 		$.get("/next", {
 			parent: currentID
 		}, function(data) {
 			if (data.status == "failed") {
-				alert("Failed to load: "+data.message);
+				message(data.message, "Failed to load");
 			} else {
-				renderPiece(data.message);
+				renderPiece(data.data);
 			}
 		}, "json");
 	}
@@ -28,7 +30,7 @@ $("#next").submit(function(e) {
 
 var hasSeenNewest = true,
 	historyManipulated = false,
-	currentID = "00000";
+	currentID = location.pathname.length > 4 ? location.pathname : "00000";
 
 $(window).scroll(function() {
 	var win = $(window);
@@ -38,41 +40,52 @@ $(window).scroll(function() {
 	window.location.reload();
 });
 
+function attachEventHandlers(elements) {
+	$(elements).not(".master").each(function() {
+		var element = $(this),
+			id = element.attr("id").replace("piece", "");
+		element.find(".star").click(function() {
+			$.post($(this).attr("href"), {
+				id: id
+			}, function(data) {
+				if (data.status == "failed") {
+					message(data.message, "Failed to star");
+				} else {
+					alert("Woooo!");
+				}
+			}, "json");
+			return false;
+		});
+		element.find(".rewind").click(function() {
+			if (historyManipulated) window.location.replace("/"+id);
+			else window.location = "/"+id;
+			return false;
+		});
+	});
+}
+
+attachEventHandlers("#story .piece");
+
 function renderPiece(piece) {
 	var snippet = $(".master.piece").clone();
-	snippet.removeClass("master").addClass("hidden").attr("id", "piece"+piece.id);
+	snippet.removeClass("master").addClass("hidden").attr("id", "piece"+piece.shortID);
 	snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 	snippet.find(".author").find("span").text("by "+piece.author.display);
 	var staraction = piece.starred ? "unstar" : "star";
-	snippet.find(".star").attr("href", "/"+staraction).click(function() {
-		$.post($(this).attr("href"), {
-			id: $(this).attr("id").replace("piece", "")
-		}, function(data) {
-			if (data.status == "failed") {
-				alert("Failed to create: "+data.message);
-			} else {
-				alert("Woooo!");
-			}
-		}, "json");
-		return false;
-	}).find("span").text(staraction);
-	snippet.find(".rewind").attr("href", "/"+piece.id).click(function() {
-		var myID = $(this).parents(".piece").attr("id").replace("piece", "");
-		if (historyManipulated) window.location.replace("/"+myID);
-		else window.location = "/"+myID;
-		return false;
-	});
+	snippet.find(".star").attr("href", "/"+staraction).find("span").text(staraction);
+	snippet.find(".rewind").attr("href", "/"+piece.id);
 	snippet.find(".content").text(piece.content);
 	var storyHeight = $("#story").outerHeight();
-	$("#story").append(snippet)
+	attachEventHandlers(snippet);
+	$("#story").append(snippet);
 	var newStoryHeight = $("#story").outerHeight(),
-		 newSnippet = $("#story .piece").last();
+		newSnippet = $("#story .piece").last();
 	$("#story").height(storyHeight).outerHeight();
 	$("#story").height(newStoryHeight);
 	$("html, body").stop().animate({
 		scrollTop: newSnippet.offset().top-200
 	}, 300, "swing");
-	updateAddress(piece.id);
+	updateAddress(piece.shortID);
 	setTimeout(function() {
 		newSnippet.removeClass("hidden");
 		$("#story").height("auto");
@@ -88,4 +101,19 @@ function updateAddress(id) {
 		historyManipulated = true;
 		history.pushState({}, id, "/"+id);
 	}
+}
+
+function message(msg, title) {
+	$("#message .contents").text(msg);
+	$("#message .header span").text(title || "Heyo!");
+	$("#message .box").removeClass("enter exit");
+	$("#message").fadeIn(100);
+	$("#message .box").addClass("enter");
+	$("#message button").focus();
+	$("#message .close").click(function() {
+		$("#message .box").addClass("exit");
+		setTimeout(function() {
+			$("#message").fadeOut(100);
+		}, 200);
+	});
 }

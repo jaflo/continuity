@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Continuity{{#if currentID}}:{{currentID}}{{/if}}</title>
+	<title>Continuity</title>
 	<link rel="stylesheet" href="/style.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
 </head>
 <body>
 <header>
-	<h1><a href="/">Continuity</a>{{#if currentID}}:<a href="/{{currentID}}">{{currentID}}</a>{{/if}}</h1>
+	<h1><a href="/">Continuity</a></h1>
 	{{#if user}}
 	<div id="user" class="loggedin">
 		Welcome back <a href="/user/2">{{user.username}}</a>! {{user.emoji}}
@@ -35,6 +35,19 @@
 	{{/if}}
 	{{{body}}}
 </main>
+<div id="message">
+	<div class="cover close"></div>
+	<div class="box">
+		<h2 class="header">
+			<span></span>
+			<div class="close">&times;</div>
+		</h2>
+		<div class="contents"></div>
+		<div class="buttons">
+			<button type="button" class="close">Okay</button>
+		</div>
+	</div>
+</div>
 <footer>
 	&copy; 2016 &ndash; all continuations belong to their respective authors
 </footer>

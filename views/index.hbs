@@ -1,3 +1,9 @@
+{{#if notfound}}
+<div class="alert error">
+	Story {{currentID}} does not exist!
+	<a href="/">Go home</a>
+</div>
+{{else}}
 <div id="story">
 	<div class="master piece">
 		<div class="options">
@@ -44,3 +50,4 @@
 		<span class="write">submit your continuation</span>
 	</button>
 </form>
+{{/if}}

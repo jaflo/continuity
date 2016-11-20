@@ -14,10 +14,10 @@ module.exports = function(app) {
     });
 
     app.get('/:id', function(req, res, next) {
-		if(req.params.id.length !== 5) { next();
-		} else if(req.params.id === '00000') { res.redirect('/'); }
+		if (req.params.id.length !== 5) next();
+		else if (req.params.id === '00000') res.redirect('/');
 		var incompletestory;
-		if(req.user) {
+		if (req.user) {
 	        var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
 	        for(var i = 0; i < arrayofstories.length; i++) {
 	            var element = arrayofstories[i];
@@ -94,12 +94,17 @@ function load(req, res, shortID, complete) { // finds lineage of story
 				});
 			});
 		} else {
-			console.log('ERROR: Story with shortID ' + shortID + ' not found');
-			res.redirect("/");
+            res.status(404).render('index', {
+				notfound: true,
+				currentID: shortID
+			});
 		}
 	}).catch(function(err) {
-		console.log('ERROR: Story with shortID ' + shortID + ' not found');
-		tools.failRequest(req, res, "Internal Error: Unable to search database");
+        res.status(404).render('index', {
+            notfound: true,
+            currentID: shortID
+        });
+		//tools.failRequest(req, res, "Internal Error: Unable to search database");
 	});
 }
 
