@@ -29,7 +29,7 @@
 				<i>{{author.emoji}}</i>
 				<span>by {{author.display}}</span>
 			</a>
-			<a href="/star" class="star">
+			<a href="/{{#if starred}}un{{/if}}star" class="star">
 				<i>⭐</i>
 				<span>{{#if starred}}un{{/if}}star</span>
 			</a>

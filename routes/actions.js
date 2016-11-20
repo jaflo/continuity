@@ -36,14 +36,12 @@ module.exports = function(app) {
 	});
 
 	app.post('/star', function(req, res) {
-		if(!req.user) { res.redirect("back"); }
-		Story.findOneAndUpdate({shortID: req.params.id}, {$inc: {starcount: 1}}).exec()
+		if(!(req.user || req.body.id)) { tools.failRequest(req, res, "Log in or select a story to star!"); }
+		Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: 1}}).exec()
 		.then(function(status) {
-			return User.findOneAndUpdate({_id: req.user._id}, {$addToSet: {starred: req.params.id}})
+			return User.findOneAndUpdate({_id: req.user._id}, {$addToSet: {starred: req.body.id}})
 			.then(function(status) {
 				return status;
-			}).catch(function(err){
-				tools.failRequest(req, res, "Internal Error: Unable to Star");
 			});
 		}).then(function(status) {
 			tools.completeRequest(req, res, {starred: true}, "back", "Starred");
@@ -53,10 +51,10 @@ module.exports = function(app) {
 	});
 
 	app.post('/unstar', function(req, res) {
-		if(!(req.user || req.params.id)) { res.redirect("back"); } // TODO: do better validation
-		Story.findOneAndUpdate({shortID: req.params.id}, {$dec: {starcount: 1}}).exec()
+		if(!(req.user || req.body.id)) { tools.failRequest(req, res, "Log in or select a story to unstar!"); }
+		Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: -1}}).exec()
 		.then(function(status) {
-			return User.findOneAndUpdate({_id: req.user._id}, {$pull: {starred: req.params.id}})
+			return User.findOneAndUpdate({_id: req.user._id}, {$pull: {starred: req.body.id}})
 			.then(function(status) {
 				return status;
 			}).catch(function(err){
