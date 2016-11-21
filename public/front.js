@@ -45,13 +45,16 @@ function attachEventHandlers(elements) {
 		var element = $(this),
 			id = element.attr("id").replace("piece", "");
 		element.find(".star").click(function() {
-			$.post($(this).attr("href"), {
+			var myself = $(this);
+			$.post(myself.attr("href"), {
 				id: id
 			}, function(data) {
 				if (data.status == "failed") {
 					message(data.message, "Failed to star");
 				} else {
-					alert("Woooo!");
+					myself.find("i").text(data.data.starred ? "🌟" : "⭐");
+					myself.find("span").text(data.data.starred ? "unstar" : "star");
+					myself.attr("href", data.data.starred ? "/unstar" : "/star");
 				}
 			}, "json");
 			return false;
@@ -111,9 +114,9 @@ function message(msg, title) {
 	$("#message .box").addClass("enter");
 	$("#message button").focus();
 	$("#message .close").click(function() {
-		$("#message .box").addClass("exit");
-		setTimeout(function() {
+		$("#message .box").on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function() {
+			$("#message .box").off();
 			$("#message").fadeOut(100);
-		}, 200);
+		}).addClass("exit");
 	});
 }
