@@ -57,7 +57,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 			var user = arr[1];
 			newStory.author = {
 				id: user.id,
-				display: user.username,
+				display: user.displayname,
 				emoji: user.emoji
 			};
 			storyArray.unshift(newStory);

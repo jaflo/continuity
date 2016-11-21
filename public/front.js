@@ -98,6 +98,7 @@ function renderPiece(piece) {
 
 function updateAddress(id) {
 	currentID = id;
+	$("#next input[name=parent]").val(id);
 	if (historyManipulated) {
 		history.replaceState({}, id, "/"+id);
 	} else {

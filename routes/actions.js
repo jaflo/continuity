@@ -22,7 +22,7 @@ module.exports = function(app) {
 						story = story.toObject();
 						story["author"] = {
 							id: user.id,
-							display: user.username,
+							display: user.displayname,
 							emoji: user.emoji
 						};
 						tools.completeRequest(req, res, story, '/' + story.shortID, "Successfully retrieved story");
@@ -115,7 +115,7 @@ function attemptCreation(req, res, shortID) {
 				newObject["starred"] = false;
 				newObject["author"] = {
 					id: req.user.id,
-					display: req.user.username,
+					display: req.user.displayname,
 					emoji: req.user.emoji
 				};
 				tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");

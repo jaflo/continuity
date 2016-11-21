@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Continuity</title>
 	<link rel="stylesheet" href="/style.css" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+	<script src="/lib/prefixfree-1.0.7.min.js"></script>
 </head>
 <body>
 <header>
 	<h1><a href="/">Continuity</a></h1>
 	{{#if user}}
 	<div id="user" class="loggedin">
-		Welcome back <a href="/user/2">{{user.username}}</a>! {{user.emoji}}
+		Welcome back {{user.emoji}} <a href="/user/2">{{user.displayname}}</a>!
+		<a href="/logout">Log out</a>
 	</div>
 	{{else}}
 	<div id="user" class="loggedout">
@@ -51,7 +54,7 @@
 <footer>
 	&copy; 2016 &ndash; all continuations belong to their respective authors
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="/lib/jquery-3.1.1.min.js"></script>
 <script src="/front.js"></script>
 </body>
 </html>

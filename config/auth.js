@@ -28,7 +28,7 @@ module.exports = function(passport, LocalStrategy) {
 					return done(null, false, req.flash('error', 'That username is already taken'));
 				} else {
 					var newUser = new User();
-					newUser.username = req.body.username;
+					newUser.displayname = req.body.displayname;
 					newUser.password = newUser.generateHash(password);
 					newUser.email = email;
 					newUser.createdat = Date.now();
