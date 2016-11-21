@@ -36,35 +36,41 @@ module.exports = function(app) {
 	});
 
 	app.post('/star', function(req, res) {
-		if(!(req.user || req.body.id)) { tools.failRequest(req, res, "Log in or select a story to star!"); }
-		Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: 1}}).exec()
-		.then(function(status) {
-			return User.findOneAndUpdate({_id: req.user._id}, {$addToSet: {starred: req.body.id}})
+		if(!(req.user && req.body.id)) { tools.failRequest(req, res, "Log in or select a story to star!"); }
+		else if(req.user.starred.includes(req.body.id)) { tools.failRequest(req, res, "Story is already starred"); }
+		else {
+			Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: 1}}).exec()
 			.then(function(status) {
-				return status;
+				return User.findOneAndUpdate({_id: req.user._id}, {$addToSet: {starred: req.body.id}})
+				.then(function(status) {
+					return status;
+				});
+			}).then(function(status) {
+				tools.completeRequest(req, res, {starred: true}, "back", "Starred");
+			}).catch(function(err) {
+				tools.failRequest(req, res, "Internal Error: Unable to Star");
 			});
-		}).then(function(status) {
-			tools.completeRequest(req, res, {starred: true}, "back", "Starred");
-		}).catch(function(err) {
-			tools.failRequest(req, res, "Internal Error: Unable to Star");
-		});
+		}
 	});
 
 	app.post('/unstar', function(req, res) {
-		if(!(req.user || req.body.id)) { tools.failRequest(req, res, "Log in or select a story to unstar!"); }
-		Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: -1}}).exec()
-		.then(function(status) {
-			return User.findOneAndUpdate({_id: req.user._id}, {$pull: {starred: req.body.id}})
+		if(!(req.user && req.body.id)) { tools.failRequest(req, res, "Log in or select a story to unstar!"); }
+		else if(!req.user.starred.includes(req.body.id)) { tools.failRequest(req, res, "Story is not starred"); }
+		else {
+			Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: -1}}).exec()
 			.then(function(status) {
-				return status;
-			}).catch(function(err){
+				return User.findOneAndUpdate({_id: req.user._id}, {$pull: {starred: req.body.id}})
+				.then(function(status) {
+					return status;
+				}).catch(function(err){
+					tools.failRequest(req, res, "Internal Error: Unable to Unstar");
+				});
+			}).then(function(status) {
+				tools.completeRequest(req, res, {starred: false}, "back", "Unstarred");
+			}).catch(function(err) {
 				tools.failRequest(req, res, "Internal Error: Unable to Unstar");
 			});
-		}).then(function(status) {
-			tools.completeRequest(req, res, {starred: false}, "back", "Unstarred");
-		}).catch(function(err) {
-			tools.failRequest(req, res, "Internal Error: Unable to Unstar");
-		});
+		}
 	});
 
 	app.post('/create', function(req, res) {
