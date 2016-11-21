@@ -26,24 +26,18 @@ describe("authentication", function() {
 		agent.get("/login")
 			.expect(200, done);
 	});
-	/*it("attempt to create a user account without any information", function(done) {
-		agent.post("/signup")
-			.expect("Location", "/signup")
-			.end(done);
-	});
-	it("create a user account using valid data", function(done) {
-		agent.get("/").end();
+	it("create a user account", function(done) {
 		agent.post("/signup")
 			.send({
 				email: "test@example.com",
-				username: "test",
+				displayname: "Tester",
 				password: "P@$$w0rd",
 				reentered: "P@$$w0rd"
 			})
 			.expect("Location", "/")
 			.end(done);
 	});
-	it("create a user account", function(done) {
+	it("log in", function(done) {
 		agent.post("/login")
 			.send({
 				email: "test@example.com",
@@ -51,5 +45,5 @@ describe("authentication", function() {
 			})
 			.expect("Location", "/")
 			.end(done);
-	});*/
+	});
 });

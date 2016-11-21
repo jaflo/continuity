@@ -104,23 +104,23 @@ h1 {
 	display: none;
 	.box {
 		position: absolute;;
-	    top: 50%;
-	    left: 50%;
-	    width: 100%;
-	    max-width: 300px;
-	    transform: translate(-50%, -50%) translateY(200%) rotate(20deg);
+		top: 50%;
+		left: 50%;
+		width: 100%;
+		max-width: 300px;
+		transform: translate(-50%, -50%) translateY(200%) rotate(20deg);
 		opacity: 0;
-	    background: white;
-	    padding: @pad @pad 0 @pad;
+		background: white;
+		padding: @pad @pad 0 @pad;
 		border: 1px solid rgba(0,0,0,0.2);
 		border-radius: 7px;
 		.transition;
 		&.enter {
-	    	transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
 			opacity: 1;
 		}
 		&.exit {
-		    transform: translate(-50%, -50%) translateY(-200%) rotate(20deg);
+			transform: translate(-50%, -50%) translateY(-200%) rotate(20deg);
 			opacity: 0;
 		}
 		.header {
@@ -175,10 +175,11 @@ h1 {
 	.piece {
 		position: relative;
 		.transition;
+		@icondistance: 1.6em;
+		min-height: 1em;
 		&.hidden {
 			opacity: 0;
 		}
-		@icondistance: 1.6em;
 		.options {
 			position: absolute;
 			top: 0;
@@ -245,6 +246,7 @@ h1 {
 			line-height: 1.4;
 		}
 		&:hover {
+			min-height: 3*@icondistance;
 			.options a, .author span {
 				transform: none;
 				opacity: 1;
