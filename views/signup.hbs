@@ -1,9 +1,16 @@
 <form id="signup" action="/signup" method="post">
 	<h2>Sign Up</h2>
 	<label for="email">Email</label>
-	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="focus" />
+	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="getfocus" />
 	<label for="displayname">Display name</label>
 	<input type="text" name="displayname" id="displayname" placeholder="Poet" />
+	<label for="emoji">Emoji</label>
+	<div id="emojipicker" class="inputlike">
+		<input type="text" id="emojisearch" placeholder="Search for an emoji" />
+		<div class="preview"></div>
+		<div class="results"></div>
+	</div>
+	<input type="text" name="emoji" id="emoji" placeholder="Choose an emoji" />
 	<label for="password">Password</label>
 	<input type="password" name="password" id="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
 	<label for="reentered">Re-enter Password</label>
@@ -11,3 +18,4 @@
 	<button type="submit" class="primary">Sign up</button>
 	<a href="/login">Have an account?</a>
 </form>
+<script src="/lib/emojimap.js"></script>

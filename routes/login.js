@@ -26,6 +26,8 @@ module.exports = function(app) {
 		req.assert('email', 'Please enter an email').notEmpty();
 		req.assert('email', 'Emails cannot exceed 500 characters').isLength({min: undefined, max: 500});
 		//req.assert('email', 'Emails must be vaild').isEmail();
+		req.assert('emoji', 'Please enter one emoji').isLength({min: 1, max: 1});
+		// TODO: Need to check if valid emoji
 		var errors = req.validationErrors();
 		if(!errors) {
 			passport.authenticate('local-signup', {

@@ -30,7 +30,7 @@ $("#next").submit(function(e) {
 
 var hasSeenNewest = true,
 	historyManipulated = false,
-	currentID = location.pathname.length > 4 ? location.pathname : "00000";
+	currentID = location.pathname.length > 4 ? location.pathname.replace("/", "") : "00000";
 
 $(window).scroll(function() {
 	var win = $(window);
@@ -108,6 +108,7 @@ function updateAddress(id) {
 }
 
 function message(msg, title) {
+	var hadFocus = $(":focus");
 	$("#message .contents").text(msg);
 	$("#message .header span").text(title || "Heyo!");
 	$("#message .box").removeClass("enter exit");
@@ -119,5 +120,54 @@ function message(msg, title) {
 			$("#message .box").off();
 			$("#message").fadeOut(100);
 		}).addClass("exit");
+		hadFocus.focus();
 	});
 }
+
+if ($("#emojipicker").length > 0) {
+	$("#emojipicker").show();
+	var emojis = Object.keys(emojimap),
+	 	chosen = emojis[emojis.length*Math.random() << 0],
+		resultcontainer = $("#emojipicker .results"),
+		prevquery = "";
+	for (var key in emojimap) {
+		var item = $("<div>").text(emojimap[key]);
+		item = $("<div>").append(item).attr("title", key.replace(/_/g, " ")).click(function(e) {
+			$("#emojipicker .results > div").removeClass("selected");
+			$(this).addClass("selected");
+			$("#emoji").val($(this).text());
+			$("#emojipicker .preview").text($(this).text());
+			if (!e.isTrigger) $("#emojisearch").val($(this).attr("title"));
+		});
+		resultcontainer.append(item);
+		if (key == chosen) {
+			item.click();
+			resultcontainer.scrollTop(9999999);
+			$("#emojisearch").val(key);
+		}
+	}
+	resultcontainer.scrollTop(resultcontainer.scrollTop()+resultcontainer.outerHeight()/2);
+	$("#emoji").attr("type", "hidden");
+	$("#emojisearch").on("change keyup keydown keypress", function() {
+		var query = $(this).val();
+		if (query != prevquery) {
+			if (query.length > 0) {
+				$("#emojipicker .results > div").hide().each(function() {
+					var myself = $(this);
+					if ((myself.text()+myself.attr("title")).indexOf(query) > -1) {
+						myself.show();
+					}
+				});
+			} else {
+				$("#emojipicker .results > div").show();
+			}
+			prevquery = query;
+		}
+	}).focus(function() {
+		$(this).parents(".inputlike").addClass("focus");
+	}).blur(function() {
+		$(this).parents(".inputlike").removeClass("focus");
+	});
+}
+
+$(".getfocus").focus();

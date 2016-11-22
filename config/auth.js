@@ -24,13 +24,13 @@ module.exports = function(passport, LocalStrategy) {
 				'email': email
 			}).exec().then(function(err, user) {
 				if (user) {
-					console.log('User already exists!')
-					return done(null, false, req.flash('error', 'That username is already taken'));
+					return done(null, false, req.flash('error', 'That email is already registered'));
 				} else {
 					var newUser = new User();
 					newUser.displayname = req.body.displayname;
 					newUser.password = newUser.generateHash(password);
 					newUser.email = email;
+					newUser.emoji = req.body.emoji;
 					newUser.createdat = Date.now();
 					newUser.changedat = Date.now();
 

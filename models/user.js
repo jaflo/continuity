@@ -13,7 +13,6 @@ var userSchema = mongoose.Schema({
 	emoji: {
         type: String,
         required: true,
-		default: "😀",
         unique: false
     },
     email: {
