@@ -49,7 +49,6 @@ var userSchema = mongoose.Schema({
     incompletestories: [{
         parent: {
             type: String,
-            unique: true
         },
         text: {
             type: String
