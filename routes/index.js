@@ -13,7 +13,7 @@ module.exports = function(app) {
 		});
     });
 
-    app.get('/:id', function(req, res, next) {
+    app.get('/story/:id', function(req, res, next) {
 		if (req.params.id.length !== 5) next();
 		else if (req.params.id === '00000') res.redirect('/');
 		var incompletestory;
@@ -39,7 +39,7 @@ module.exports = function(app) {
 
 // methods
 
-function getParentStory(req, newStory, storyArray, callback, render) { //recursively moves up story lineage up to story 0
+function getParentStory(req, newStory, storyArray, callback, render) { // recursively moves up story lineage up to story 0
 	if (newStory.shortID != '00000') {
 		newStory = newStory.toObject();
 		newStory["starred"] = req.user && req.user.starred.includes(newStory.shortID);
@@ -47,7 +47,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 			shortID: newStory.parent
 		}).exec()
 		.then(function(newParentStory) {
-			return User.findOne({email: newStory.author}).exec()
+			return User.findOne({shortID: newStory.author}).exec()
 			.then(function(user) {
 				return [newParentStory, user];
 			});
@@ -56,7 +56,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 			var newParentStory = arr[0];
 			var user = arr[1];
 			newStory.author = {
-				id: user.id,
+				id: user.shortID,
 				display: user.displayname,
 				emoji: user.emoji
 			};
@@ -70,7 +70,7 @@ function getParentStory(req, newStory, storyArray, callback, render) { //recursi
 		newStory = newStory.toObject();
 		newStory["starred"] = req.user && req.user.starred.includes(newStory.shortID);
 		newStory["author"] = {
-			id: '1',
+			id: '00000',
 			display: 'Your homedog, ejmejm',
 			emoji: "😀"
 		};
@@ -104,31 +104,5 @@ function load(req, res, shortID, complete) { // finds lineage of story
             notfound: true,
             currentID: shortID
         });
-		//tools.failRequest(req, res, "Internal Error: Unable to search database");
 	});
-}
-
-function timeSince(date) { // returns time since date as String
-	var seconds = Math.floor((new Date() - date) / 1000);
-	var interval = Math.floor(seconds / 31536000);
-	if (interval > 1) {
-		return interval + " years";
-	}
-	interval = Math.floor(seconds / 2592000);
-	if (interval > 1) {
-		return interval + " months";
-	}
-	interval = Math.floor(seconds / 86400);
-	if (interval > 1) {
-		return interval + " days";
-	}
-	interval = Math.floor(seconds / 3600);
-	if (interval > 1) {
-		return interval + " hours";
-	}
-	interval = Math.floor(seconds / 60);
-	if (interval > 1) {
-		return interval + " minutes";
-	}
-	return Math.floor(seconds) + " seconds";
 }

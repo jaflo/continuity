@@ -1,4 +1,5 @@
 var User = require('../models/user.js');
+var ID_LENGTH = 5;
 
 module.exports = function(passport, LocalStrategy) {
 	passport.serializeUser(function(user, done) {
@@ -27,20 +28,40 @@ module.exports = function(passport, LocalStrategy) {
 				if (user) {
 					return done(null, false, req.flash('error', 'That email is already registered'));
 				} else {
-					var newUser = new User();
-					newUser.displayname = req.body.displayname;
-					newUser.password = newUser.generateHash(password);
-					newUser.email = email;
-					newUser.emoji = req.body.emoji;
-					newUser.createdat = Date.now();
-					newUser.changedat = Date.now();
+					function randomString(length) {
+						return Math.random().toString(36).substr(2, length || ID_LENGTH);
+					}
 
-					newUser.save(function(err) {
-						if (err) {
-							throw err;
-						}
-						return done(null, newUser);
-					});
+					function attemptCreation(shortID) {
+						User.find({shortID: shortID}).exec()
+						.then(function(users) {
+							if(users.length == 0) {
+								var newUser = new User();
+								newUser.displayname = req.body.displayname;
+								newUser.password = newUser.generateHash(password);
+								newUser.email = email;
+								newUser.shortID = shortID;
+								newUser.emoji = req.body.emoji;
+								newUser.createdat = Date.now();
+								newUser.changedat = Date.now();
+
+								newUser.save(function(err) {
+									if (err) {
+										throw err;
+									}
+									return done(null, newUser);
+								});
+							} else {
+								attemptCreation(randomString(5));
+							}
+						})
+						.catch(function(err) {
+							console.log('Error!');
+							console.log(err);
+							return done(err);
+						});
+					}
+					attemptCreation(randomString(5));
 				}
 			})
 			.catch(function(err) {

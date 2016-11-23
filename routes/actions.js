@@ -17,15 +17,15 @@ module.exports = function(app) {
 				}
 				else {
 					var story = stories[Math.floor(Math.random()*stories.length)];
-					User.findOne({email: story.author}).exec()
+					User.findOne({shortID: story.author}).exec()
 					.then(function(user) {
 						story = story.toObject();
 						story["author"] = {
-							id: user.id,
+							id: user.shortID,
 							display: user.displayname,
 							emoji: user.emoji
 						};
-						tools.completeRequest(req, res, story, '/' + story.shortID, "Successfully retrieved story");
+						tools.completeRequest(req, res, story, '/story/' + story.shortID, "Successfully retrieved story");
 					});
 				}
 			})
@@ -104,7 +104,7 @@ function attemptCreation(req, res, shortID) {
 			var newStory = new Story({
 				shortID: shortID,
 				parent: req.body.parent,
-				author: req.user.email,
+				author: req.user.shortID,
 				content: req.body.content,
 				createdat: Date.now(),
 				changedat: Date.now()
@@ -114,7 +114,7 @@ function attemptCreation(req, res, shortID) {
 				var newObject = newStory.toObject();
 				newObject["starred"] = false;
 				newObject["author"] = {
-					id: req.user.id,
+					id: req.user.shortID,
 					display: req.user.displayname,
 					emoji: req.user.emoji
 				};

@@ -21,6 +21,11 @@ var userSchema = mongoose.Schema({
         unique: true,
         maxlength: 500
     },
+	shortID: {
+		type: String,
+		required: true,
+		unique: true
+	},
     password: {
         type: String,
         required: true,
