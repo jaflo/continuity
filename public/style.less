@@ -67,7 +67,7 @@ button {
 a {
 	border-bottom: 1px solid;
 	text-decoration: none;
-	&:hover {
+	&:hover, &:focus {
 		border-bottom-width: 2px;
 	}
 }
@@ -126,20 +126,22 @@ h1 {
 		left: 50%;
 		width: 100%;
 		max-width: 300px;
-		transform: translate(-50%, -50%) translateY(200%) rotate(20deg);
+		transform: translate(-50%, -50%) translateY(100%) rotate(10deg) scale(0.9);
 		opacity: 0;
 		background: white;
 		padding: @pad @pad 0 @pad;
-		border: 1px solid rgba(0,0,0,0.2);
+		border: 1px solid rgba(0,0,0,0.8);
 		border-radius: 7px;
 		.transition;
 		&.enter {
 			transform: translate(-50%, -50%);
 			opacity: 1;
+			box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 		}
 		&.exit {
-			transform: translate(-50%, -50%) translateY(-200%) rotate(20deg);
+			transform: translate(-50%, -50%) translateY(-200%) rotate(10deg) scale(1.1);
 			opacity: 0;
+			box-shadow: none;
 		}
 		.header {
 			font-size: 1.4em;
@@ -149,10 +151,18 @@ h1 {
 				top: @pad;
 				right: @pad;
 				margin-top: -@pad/2;
+				cursor: pointer;
+				opacity: 0.7;
+				&:hover, &:focus {
+					opacity: 1;
+				}
 			}
 		}
 		.contents {
 			padding: 2*@pad 0;
+		}
+		.buttons button {
+			transition-delay: 0.5s;
 		}
 	}
 	.cover {
@@ -162,7 +172,7 @@ h1 {
 		right: 0;
 		bottom: 0;
 		background: black;
-		opacity: 0.6;
+		opacity: 0.7;
 		margin: -2*@pad;
 	}
 }
@@ -205,6 +215,7 @@ h1 {
 			top: 0;
 			left: 0;
 			overflow: hidden;
+			width: 60%;
 			a {
 				display: block;
 				text-decoration: none;
@@ -214,6 +225,7 @@ h1 {
 				color: @maintextcolor;
 				border: none;
 				z-index: 2;
+				outline: none;
 				i {
 					position: relative;
 					width: 1.3em;
@@ -234,9 +246,21 @@ h1 {
 					color: white;
 					border-radius: 4px;
 				}
+				&:hover, &:focus {
+					span {
+						background: black;
+					}
+				}
 			}
 			.author {
 				z-index: 3;
+				span {
+					max-width: 100%;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+					vertical-align: bottom;
+				}
 			}
 			.star, .rewind {
 				opacity: 0;
@@ -253,11 +277,6 @@ h1 {
 					transition-delay: 0.1s;
 				}
 			}
-			&:hover a span {
-				transform: none;
-				opacity: 1;
-				transition-delay: 0;
-			}
 		}
 		.content {
 			.transition;
@@ -265,7 +284,12 @@ h1 {
 			position: relative;
 			line-height: 1.4;
 		}
-		&:hover {
+		&.hover a span, .options:hover a span {
+			transform: none;
+			opacity: 1;
+			transition-delay: 0;
+		}
+		&:hover, &.hover {
 			min-height: 3*@icondistance;
 			.options a, .author span {
 				transform: none;
@@ -338,7 +362,26 @@ h1 {
 		overflow-y: scroll;
 		height: 100px;
 		margin: -@pad;
-		padding: 0 @pad;
+		padding: @pad;
+		/* via http://lea.verou.me/2012/04/background-attachment-local/ */
+		background:
+			/* Shadow covers */
+			linear-gradient(@backgroundcolor 30%, fadeout(@backgroundcolor, 100%)),
+			linear-gradient(fadeout(@backgroundcolor, 100%), @backgroundcolor 70%) 0 100%,
+			/* Shadows */
+			radial-gradient(50% 0, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)),
+			radial-gradient(50% 100%, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+		background:
+			/* Shadow covers */
+			linear-gradient(@backgroundcolor 30%, fadeout(@backgroundcolor, 100%)),
+			linear-gradient(fadeout(@backgroundcolor, 100%), @backgroundcolor 70%) 0 100%,
+			/* Shadows */
+			radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),
+			radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+		background-color: @backgroundcolor;
+		background-repeat: no-repeat;
+		background-size: 100% 20px, 100% 40px, 100% 14px, 100% 14px;
+		background-attachment: local, local, scroll, scroll;
 		&.loading {
 			line-height: 100px;
 			text-align: center;
@@ -350,9 +393,9 @@ h1 {
 			display: inline-block;
 			cursor: pointer;
 			text-align: center;
+			border-radius: 5px;
 			&.selected {
-				background: @boldcolor;
-				border-radius: 5px;
+				background: fadeout(@boldcolor, 50%);
 			}
 			> div {
 				padding: @pad;

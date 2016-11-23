@@ -64,6 +64,11 @@ function attachEventHandlers(elements) {
 			else window.location = "/"+id;
 			return false;
 		});
+		element.find(".options a").focus(function() {
+			element.addClass("hover");
+		}).blur(function() {
+			element.removeClass("hover");
+		});
 	});
 }
 
@@ -146,9 +151,10 @@ if ($("#emojipicker").length > 0) {
 			if (key == chosen) {
 				item.click();
 				resultcontainer.scrollTop(9999999);
-				$("#emojisearch").val(key);
+				$("#emojisearch").val(key.replace(/_/g, " "));
 			}
 		}
+		prevquery = chosen.replace(/_/g, " ");
 		if (resultcontainer.scrollTop() > 50) resultcontainer.scrollTop(resultcontainer.scrollTop()+resultcontainer.outerHeight()/2);
 		$("#emojisearch").on("change keyup keydown keypress", function() {
 			var query = $(this).val();
