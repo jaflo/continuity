@@ -16,6 +16,7 @@
     "express": "~4.13.4",
     "express-session": "^1.14.2",
     "express-validator": "^2.21.0",
+    "handlebars-helper-pluralize": "^1.0.3",
     "hbs": "~4.0.0",
     "less-middleware": "1.0.x",
     "mongoose": "^4.6.3",

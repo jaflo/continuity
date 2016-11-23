@@ -1,9 +1,21 @@
+var hasSeenNewest = true,
+	historyManipulated = false,
+	currentID = location.pathname.length > 4 ? location.pathname.replace("/", "") : "00000",
+	tofocus = $(".getfocus"), count = 0,
+	origboxheight = $("#next textarea").innerHeight();
+
+while (tofocus.val() && count < 10) {
+	tofocus = tofocus.nextAll("input, select, textarea").first();
+	count++; // just in case
+}
+tofocus.focus();
+
 $(document).ajaxError(function(e, jqXHR) {
 	console.log(jqXHR);
 	if (jqXHR.status == 0) message("Check your internet connection.", "Unable to connect");
 });
 
-$("#login, #signsup").submit(function() {
+$("#login, #signup").submit(function() {
 	var list = $("<ul>"), missing = 0;
 	$(this).children("input").each(function() {
 		if (!$(this).val()) {
@@ -19,6 +31,10 @@ $("#login, #signsup").submit(function() {
 
 $("#next textarea").on("change keyup keydown keypress", function() {
 	$("#next").toggleClass("hastext", $(this).val().length > 0);
+	$("main").append($("<div id=tester class=inputlike>").text($(this).val()));
+	var determinedheight = $("#tester").innerHeight() + 30;
+	$("#next textarea").height(determinedheight > origboxheight ? determinedheight : "");
+	$("#tester").remove();
 });
 
 $("#next").submit(function(e) {
@@ -46,10 +62,6 @@ $("#next").submit(function(e) {
 	}
 	e.preventDefault();
 });
-
-var hasSeenNewest = true,
-	historyManipulated = false,
-	currentID = location.pathname.length > 4 ? location.pathname.replace("/", "") : "00000";
 
 $(window).scroll(function() {
 	var win = $(window);
@@ -197,10 +209,3 @@ if ($("#emojipicker").length > 0) {
 		});
 	});
 }
-
-var tofocus = $(".getfocus"), count = 0;
-while (tofocus.val() && count < 10) {
-	tofocus = tofocus.nextAll("input, select, textarea").first();
-	count++; // just in case
-}
-tofocus.focus();
