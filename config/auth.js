@@ -20,6 +20,7 @@ module.exports = function(passport, LocalStrategy) {
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
 		process.nextTick(function() {
+			req.flash("email", email);
 			User.findOne({
 				'email': email
 			}).exec().then(function(err, user) {
@@ -54,9 +55,10 @@ module.exports = function(passport, LocalStrategy) {
 		usernameField: 'email', // by default, local strategy uses username and password, we will override with email
 		passwordField: 'password',
 		passReqToCallback: true // allows us to pass back the entire request to the callback
-	}, function(req, username, password, done) { // callback with username and password from our form
+	}, function(req, email, password, done) { // callback with username and password from our form
+		req.flash("email", email);
 		User.findOne({
-			'email': username
+			'email': email
 		}, function(err, user) {
 			if (err) {
 				return done(err);

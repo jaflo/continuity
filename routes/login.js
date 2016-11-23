@@ -28,15 +28,17 @@ module.exports = function(app) {
 		//req.assert('email', 'Emails must be vaild').isEmail();
 		req.assert('emoji', 'Please enter one emoji').isLength({min: 1, max: 20});
 		// TODO: Need to check if valid emoji (not all emoji are of length 1)
+		req.flash("email", req.body.email);
+		req.flash("displayname", req.body.displayname);
+		req.flash("emoji", req.body.emoji);
 		var errors = req.validationErrors();
-		if(!errors) {
+		if (!errors) {
 			passport.authenticate('local-signup', {
 				successRedirect: '/', // redirect to the secure profile section
 				failureRedirect: '/signup', // redirect back to the signup page if there is an error
 				failureFlash: true // allow flash messages
 			})(req, res);
-		}
-		else {
+		} else {
 			tools.failRequest(req, res, errors);
 		}
 	});

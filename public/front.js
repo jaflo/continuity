@@ -1,3 +1,22 @@
+$(document).ajaxError(function(e, jqXHR) {
+	console.log(jqXHR);
+	if (jqXHR.status == 0) message("Check your internet connection.", "Unable to connect");
+});
+
+$("#login, #signsup").submit(function() {
+	var list = $("<ul>"), missing = 0;
+	$(this).children("input").each(function() {
+		if (!$(this).val()) {
+			list.append($("<li>").text($("label[for="+$(this).attr("name")+"]").text().toLowerCase()));
+			missing++;
+		}
+	});
+	if (missing) {
+		message($("<div>").text("You did not enter anything for").append(list), "Missing information");
+		return false;
+	}
+});
+
 $("#next textarea").on("change keyup keydown keypress", function() {
 	$("#next").toggleClass("hastext", $(this).val().length > 0);
 });
@@ -114,7 +133,7 @@ function updateAddress(id) {
 
 function message(msg, title) {
 	var hadFocus = $(":focus");
-	$("#message .contents").text(msg);
+	$("#message .contents").html(msg);
 	$("#message .header span").text(title || "Heyo!");
 	$("#message .box").removeClass("enter exit");
 	$("#message").fadeIn(100);
@@ -135,9 +154,9 @@ if ($("#emojipicker").length > 0) {
 	$.getJSON("/lib/emojimap.json", function(emojimap) {
 		delete emojimap["information"];
 		var emojis = Object.keys(emojimap),
-			chosen = emojis[emojis.length*Math.random() << 0],
+			chosen = $("#emoji").val() ? "" : emojis[emojis.length*Math.random() << 0],
 			resultcontainer = $("#emojipicker .results").removeClass("loading").empty(),
-			prevquery = "";
+			prevquery = "", prevemoji = $("#emoji").val();
 		for (var key in emojimap) {
 			var item = $("<div>").text(emojimap[key]);
 			item = $("<div>").append(item).attr("title", key.replace(/_/g, " ")).click(function(e) {
@@ -148,7 +167,7 @@ if ($("#emojipicker").length > 0) {
 				if (!e.isTrigger) $("#emojisearch").val($(this).attr("title"));
 			});
 			resultcontainer.append(item);
-			if (key == chosen) {
+			if (key == chosen || emojimap[key] == prevemoji) {
 				item.click();
 				resultcontainer.scrollTop(9999999);
 				$("#emojisearch").val(key.replace(/_/g, " "));
@@ -179,4 +198,9 @@ if ($("#emojipicker").length > 0) {
 	});
 }
 
-$(".getfocus").focus();
+var tofocus = $(".getfocus"), count = 0;
+while (tofocus.val() && count < 10) {
+	tofocus = tofocus.nextAll("input, select, textarea").first();
+	count++; // just in case
+}
+tofocus.focus();

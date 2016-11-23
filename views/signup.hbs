@@ -1,16 +1,16 @@
 <form id="signup" action="/signup" method="post">
 	<h2>Sign Up</h2>
 	<label for="email">Email</label>
-	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="getfocus" />
+	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="getfocus" value="{{email}}" />
 	<label for="displayname">Display name</label>
-	<input type="text" name="displayname" id="displayname" placeholder="Poet" />
+	<input type="text" name="displayname" id="displayname" placeholder="Poet" value="{{displayname}}" />
 	<label for="emoji">Emoji</label>
 	<div id="emojipicker" class="inputlike">
 		<input type="text" id="emojisearch" placeholder="Search for an emoji" />
 		<div class="preview"></div>
 		<div class="loading results">loading...</div>
 	</div>
-	<input type="text" name="emoji" id="emoji" placeholder="Choose an emoji" />
+	<input type="text" name="emoji" id="emoji" placeholder="Choose an emoji" value="{{emoji}}" />
 	<label for="password">Password</label>
 	<input type="password" name="password" id="password" placeholder="•••••••" />
 	<label for="reentered">Re-enter Password</label>

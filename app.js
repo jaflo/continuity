@@ -58,6 +58,9 @@ app.use(flash());
 app.use(function(req, res, next) {
 	res.locals.success = req.flash('success');
 	res.locals.error = req.flash('error');
+	res.locals.email = req.flash('email');
+	res.locals.displayname = req.flash('displayname');
+	res.locals.emoji = req.flash('emoji');
 	res.locals.user = req.user;
 	res.locals.url = "http://localhost:3000" + req.originalUrl;
 	next();
