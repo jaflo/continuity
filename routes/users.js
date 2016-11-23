@@ -6,12 +6,12 @@ Author name, emoji, number of continuations written, continuations, account crea
 */
 module.exports = function(app) {
 	app.get('/user/:id', function(req, res) {
-		User.findOne({shortID: req.params.shortID}).exec()
+		User.findOne({shortID: req.params.id}).exec()
 		.then(function(user) {
 			if(!user) {
 				res.status(404).render('index', {
 					notfound: true,
-					currentID: shortID
+					currentID: req.params.shortID
 				});
 			} else {
 				Story.find({author: user.shortID}).exec()
