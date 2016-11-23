@@ -10,6 +10,7 @@ var flash = require('connect-flash');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var hbs = require("hbs")
 
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
@@ -19,8 +20,9 @@ var Story = require('./models/story.js');
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+app.set("views", path.join(__dirname, "views"));
+hbs.registerHelper("pluralize", require("handlebars-helper-pluralize"));
+app.set("view engine", "hbs");
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

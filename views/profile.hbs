@@ -1,0 +1,30 @@
+{{#if notfound}}
+<div class="alert error">
+	User {{currentID}} does not exist!
+	<a href="/">Go home</a>
+</div>
+{{else}}
+<h2>{{emoji}} {{display}}</h2>
+wrote {{numberofstories}} {{#pluralize numberofstories continuation}} since {{createdat}}
+<div id="story">
+	{{#each stories}}
+	<div class="piece" id="piece{{shortID}}">
+		<div class="options">
+			<a href="/user/{{author.shortID}}" class="author">
+				<i>{{author.emoji}}</i>
+				<span>by {{author.display}}</span>
+			</a>
+			<a href="/{{#if starred}}un{{/if}}star" class="star">
+				<i>{{#if starred}}🌟{{else}}⭐{{/if}}</i>
+				<span>{{#if starred}}un{{/if}}star</span>
+			</a>
+			<a href="/{{shortID}}" class="rewind">
+				<i>⏪</i>
+				<span>rewind</span>
+			</a>
+		</div>
+		<div class="content">{{content}}</div>
+	</div>
+	{{/each}}
+</div>
+{{/if}}
