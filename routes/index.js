@@ -71,8 +71,8 @@ function getParentStory(req, newStory, storyArray, callback, render) { // recurs
 		newStory["starred"] = req.user && req.user.starred.includes(newStory.shortID);
 		newStory["author"] = {
 			id: '00000',
-			display: 'Your homedog, ejmejm',
-			emoji: "😀"
+			display: 'Hatchling',
+			emoji: "🐣"
 		};
 		storyArray.unshift(newStory);
 		render();

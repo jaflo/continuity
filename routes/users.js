@@ -6,6 +6,7 @@ Author name, emoji, number of continuations written, continuations, account crea
 */
 module.exports = function(app) {
 	app.get('/user/:id', function(req, res) {
+		if (req.params.id == "00000") res.redirect("/");
 		User.findOne({shortID: req.params.id}).exec()
 		.then(function(user) {
 			if(!user) {

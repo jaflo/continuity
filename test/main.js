@@ -12,7 +12,7 @@ describe("main", function() {
 			.expect(200, done);
 	});
 	it("load a non-existant story", function(done) {
-		agent.get("/meows")
+		agent.get("/story/meows")
 			.expect(404, done);
 	});
 });
@@ -31,6 +31,7 @@ describe("authentication", function() {
 			.send({
 				email: "test@example.com",
 				displayname: "Tester",
+				emoji: "🤖",
 				password: "P@$$w0rd",
 				reentered: "P@$$w0rd"
 			})

@@ -56,7 +56,16 @@ textarea, input, button, .inputlike {
 	}
 	&:focus, &.focus {
 		border-color: @boldcolor;
-		box-shadow: 0 4px 20px -4px @boldcolor;
+		box-shadow: 0 0 2px @boldcolor;
+	}
+	&[disabled] {
+		opacity: 0.6;
+		box-shadow: none !important;
+		.bordered;
+		cursor: not-allowed;
+		&:hover, &:active {
+			opacity: 0.5;
+		}
 	}
 }
 
@@ -68,6 +77,14 @@ button {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	user-select: none;
+	cursor: pointer;
+	&:active {
+		background: rgba(0,0,0,0.02);
+		border-color: rgba(0,0,0,0.2);
+		color: rgba(0,0,0,0.6);
+		transition: none;
+		box-shadow: inset 0 2px 5px rgba(0,0,0,0.5) !important;
+	}
 }
 
 a {
@@ -148,7 +165,7 @@ h2 {
 		background: white;
 		padding: @pad @pad 0 @pad;
 		border: 1px solid rgba(0,0,0,0.8);
-		border-radius: 7px;
+		border-radius: 2px;
 		.transition;
 		&.enter {
 			transform: translate(-50%, -50%);
@@ -163,6 +180,8 @@ h2 {
 		.header {
 			font-size: 1.4em;
 			margin: 0;
+			padding-right: @pad*3;
+			line-height: 1;
 			.close {
 				position: absolute;
 				top: @pad;
@@ -176,7 +195,7 @@ h2 {
 			}
 		}
 		.contents {
-			padding: 2*@pad 0;
+			padding: @pad 0;
 			ul {
 				padding-top: 0;
 				margin-top: @pad;
@@ -184,8 +203,11 @@ h2 {
 				margin-bottom: 0;
 			}
 		}
-		.buttons button {
-			transition-delay: 0.5s;
+		.buttons {
+			padding-top: @pad;
+			button {
+				transition-delay: 0.5s;
+			}
 		}
 	}
 	.cover {

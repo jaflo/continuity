@@ -36,8 +36,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/star', function(req, res) {
-		if(!(req.user && req.body.id)) { tools.failRequest(req, res, "Log in or select a story to star!"); }
-		else if(req.user.starred.includes(req.body.id)) { tools.failRequest(req, res, "Story is already starred"); }
+		if (!req.user) tools.failRequest(req, res, "Log in to star this story!");
+		else if (!req.body.id) tools.failRequest(req, res, "Select a story to star!");
+		else if (req.user.starred.includes(req.body.id)) tools.failRequest(req, res, "Story is already starred");
 		else {
 			Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: 1}}).exec()
 			.then(function(status) {
@@ -54,8 +55,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/unstar', function(req, res) {
-		if(!(req.user && req.body.id)) { tools.failRequest(req, res, "Log in or select a story to unstar!"); }
-		else if(!req.user.starred.includes(req.body.id)) { tools.failRequest(req, res, "Story is not starred"); }
+		if (!req.user) tools.failRequest(req, res, "Log in to star this story!");
+		else if (!req.body.id) tools.failRequest(req, res, "Select a story to star!");
+		else if (!req.user.starred.includes(req.body.id)) tools.failRequest(req, res, "Story is not starred");
 		else {
 			Story.findOneAndUpdate({shortID: req.body.id}, {$inc: {starcount: -1}}).exec()
 			.then(function(status) {
@@ -74,8 +76,8 @@ module.exports = function(app) {
 	});
 
 	app.post('/create', function(req, res) {
-		if(!req.user) {
-			tools.failRequest(req, res, "Please log in!")
+		if (!req.user) {
+			tools.failRequest(req, res, "Please log in to create a story!")
 		} else {
 			req.assert('parent', 'A parent story is required!').notEmpty();
 			req.assert('content', 'Please write something').notEmpty();
@@ -110,15 +112,19 @@ function attemptCreation(req, res, shortID) {
 				changedat: Date.now()
 			});
 			newStory.save(function(error, test) {
-				if(error) { tools.failRequest(req, res, "Internal Error: Unable to create story"); }
-				var newObject = newStory.toObject();
-				newObject["starred"] = false;
-				newObject["author"] = {
-					id: req.user.shortID,
-					display: req.user.displayname,
-					emoji: req.user.emoji
-				};
-				tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
+				if (error) {
+					console.log(error);
+					tools.failRequest(req, res, "Internal Error: Unable to create story");
+				} else {
+					var newObject = newStory.toObject();
+					newObject["starred"] = false;
+					newObject["author"] = {
+						id: req.user.shortID,
+						display: req.user.displayname,
+						emoji: req.user.emoji
+					};
+					tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
+				}
 			});
 		}
 	})
