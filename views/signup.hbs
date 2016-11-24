@@ -1,5 +1,9 @@
 <form id="signup" action="/signup" method="post">
 	<h2>Sign Up</h2>
+	<p>
+		Create an account to write and star stories!
+		<a href="/login">Have an account?</a>
+	</p>
 	<label for="email">Email</label>
 	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="getfocus" value="{{email}}" />
 	<label for="displayname">Display name</label>
@@ -16,5 +20,4 @@
 	<label for="reentered">Re-enter Password</label>
 	<input type="password" name="reentered" id="reentered" placeholder="•••••••" />
 	<button type="submit" class="primary">Sign up</button>
-	<a href="/login">Have an account?</a>
 </form>
