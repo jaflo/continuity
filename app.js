@@ -10,7 +10,8 @@ var flash = require('connect-flash');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var hbs = require("hbs")
+var hbs = require("hbs");
+var moment = require("moment");
 
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
@@ -21,6 +22,10 @@ var app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
+hbs.registerHelper("timestamp", function(time) {
+	var t = moment(time);
+	return '<time datetime="'+t.format()+'">'+t.fromNow()+"</time>";
+});
 hbs.registerHelper("pluralize", require("handlebars-helper-pluralize"));
 app.set("view engine", "hbs");
 

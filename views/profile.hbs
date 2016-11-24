@@ -4,27 +4,26 @@
 	<a href="/">Go home</a>
 </div>
 {{else}}
-<h2>{{emoji}} {{display}}</h2>
-wrote {{numberofstories}} {{#pluralize numberofstories continuation}} since {{createdat}}
-<div id="story">
+<div id="profileheader">
+	<span class="emoji">{{emoji}}</span>
+	<h2>{{display}}</h2>
+	{{#if numberofstories}}
+		has written {{pluralize numberofstories "story" true}} since creating an account {{{timestamp createdat}}}
+	{{else}}
+		created an account {{{timestamp createdat}}}
+	{{/if}}
+</div>
+{{#if numberofstories}}
+<div id="listing">
 	{{#each stories}}
-	<div class="piece" id="piece{{shortID}}">
-		<div class="options">
-			<a href="/user/{{author.shortID}}" class="author">
-				<i>{{author.emoji}}</i>
-				<span>by {{author.display}}</span>
-			</a>
-			<a href="/{{#if starred}}un{{/if}}star" class="star">
-				<i>{{#if starred}}🌟{{else}}⭐{{/if}}</i>
-				<span>{{#if starred}}un{{/if}}star</span>
-			</a>
-			<a href="/{{shortID}}" class="rewind">
-				<i>⏪</i>
-				<span>rewind</span>
-			</a>
-		</div>
-		<div class="content">{{content}}</div>
-	</div>
+	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
+		{{content}}
+	</a>
 	{{/each}}
 </div>
+{{else}}
+<div id="listing" class="empty">
+	Check back later!
+</div>
+{{/if}}
 {{/if}}

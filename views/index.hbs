@@ -25,7 +25,7 @@
 	{{#each stories}}
 	<div class="piece" id="piece{{shortID}}">
 		<div class="options">
-			<a href="/user/{{author.shortID}}" class="author">
+			<a href="/user/{{author.id}}" class="author">
 				<i>{{author.emoji}}</i>
 				<span>by {{author.display}}</span>
 			</a>
@@ -33,7 +33,7 @@
 				<i>{{#if starred}}🌟{{else}}⭐{{/if}}</i>
 				<span>{{#if starred}}un{{/if}}star</span>
 			</a>
-			<a href="/{{shortID}}" class="rewind">
+			<a href="/story/{{shortID}}" class="rewind">
 				<i>⏪</i>
 				<span>rewind</span>
 			</a>

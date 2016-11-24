@@ -1,6 +1,6 @@
 var hasSeenNewest = true,
 	historyManipulated = false,
-	currentID = location.pathname.length > 4 ? location.pathname.replace("/", "") : "00000",
+	currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
 	tofocus = $(".getfocus"), count = 0,
 	origboxheight = $("#next textarea").innerHeight();
 
@@ -91,8 +91,8 @@ function attachEventHandlers(elements) {
 			return false;
 		});
 		element.find(".rewind").click(function() {
-			if (historyManipulated) window.location.replace("/"+id);
-			else window.location = "/"+id;
+			if (historyManipulated) window.location.replace("/story/"+id);
+			else window.location = "/story/"+id;
 			return false;
 		});
 		element.find(".options a").focus(function() {
@@ -112,7 +112,7 @@ function renderPiece(piece) {
 	snippet.find(".author").find("span").text("by "+piece.author.display);
 	var staraction = piece.starred ? "unstar" : "star";
 	snippet.find(".star").attr("href", "/"+staraction).find("span").text(staraction);
-	snippet.find(".rewind").attr("href", "/"+piece.id);
+	snippet.find(".rewind").attr("href", "/story/"+piece.id);
 	snippet.find(".content").text(piece.content);
 	var storyHeight = $("#story").outerHeight();
 	attachEventHandlers(snippet);
@@ -136,10 +136,10 @@ function updateAddress(id) {
 	currentID = id;
 	$("#next input[name=parent]").val(id);
 	if (historyManipulated) {
-		history.replaceState({}, id, "/"+id);
+		history.replaceState({}, id, "/story/"+id);
 	} else {
 		historyManipulated = true;
-		history.pushState({}, id, "/"+id);
+		history.pushState({}, id, "/story/"+id);
 	}
 }
 

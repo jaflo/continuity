@@ -17,7 +17,7 @@ module.exports = function(app) {
 				Story.find({author: user.shortID}).exec()
 				.then(function(stories) {
 					if(req.user && req.user.shortID == user.shortID) {}
-					res.render('user', {
+					res.render('profile', {
 						display: user.displayname,
 						emoji: user.emoji,
 						createdat: user.createdat,
@@ -27,13 +27,13 @@ module.exports = function(app) {
 				})
 				.catch(function(err) {
 					console.log(err);
-					tools.failRequest(req, res, "Internal Error: Unable to find user");
+					res.render('profile', { notfound: true });
 				});
 			}
 		})
 		.catch(function(err) {
 			console.log(err);
-			tools.failRequest(req, res, "Internal Error: Unable to find user");
+			res.render('profile', { notfound: true });
 		});
 	});
 };
