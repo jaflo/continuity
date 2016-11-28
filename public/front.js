@@ -2,9 +2,9 @@ $(document).ready(function() {
 	var hasSeenNewest = true,
 		historyManipulated = false,
 		currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
-		tofocus = $(".getfocus"), count = 0,
+		tofocus = $(".getfocus"), count = 0, writesaver,
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
-		origboxheight = writestoryarea.innerHeight(),
+		origboxheight = writestoryarea.innerHeight(), prevText = "",
 		valuechange = "change keyup keydown keypress";
 
 	while (tofocus.val() && count < 10) {
@@ -40,13 +40,46 @@ $(document).ready(function() {
 		}
 	});
 
-	writestoryarea.on(valuechange, function() {
-		actionform.toggleClass("hastext", $(this).val().length > 0);
-		$("main").append($("<div id=tester class=inputlike>").text($(this).val()));
-		var determinedheight = $("#tester").innerHeight() + 30;
-		writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
-		$("#tester").remove();
-	});
+	if (typeof(Storage) !== "undefined") {
+		writestoryarea.on(valuechange, function(e) {
+			var nowText = $(this).val();
+			if (prevText != nowText) {
+				actionform.toggleClass("hastext", nowText.length > 0);
+				$("main").append($("<div id=tester class=inputlike>").text(nowText));
+				var determinedheight = $("#tester").innerHeight() + 30;
+				writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
+				$("#tester").remove();
+				if (!e.isTrigger) {
+					clearTimeout(writesaver);
+					$("#next .status").text("waiting");
+					writesaver = setTimeout(function() {
+						if (nowText == "") {
+							$("#next .status").text("clearing...");
+							localStorage.removeItem("save_"+currentID);
+							$("#next .status").text("cleared");
+						} else {
+							$("#next .status").text("saving...");
+							localStorage.setItem("save_"+currentID, nowText);
+							$("#next .status").text("saved");
+						}
+						/*$.post("/save", $("#next").serialize(), function(data) {
+							if (data.status == "failed") {
+								$("#next .status").text("failed "+data.message);
+							} else {
+								$("#next .status").text("saved");
+							}
+						}, "json").fail(function() {
+							$("#next .status").text("failed");
+						});*/
+					}, 1000);
+				}
+			}
+			prevText = nowText;
+		});
+		$("#next .status").text("restoring...");
+		writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
+		$("#next .status").text("ready");
+	}
 
 	actionform.submit(function(e) {
 		if (!$(this).find("button").attr("disabled")) {
@@ -57,6 +90,7 @@ $(document).ready(function() {
 						message(data.message, "Failed to create");
 					} else {
 						writestoryarea.val("");
+						localStorage.removeItem("save_"+currentID);
 						renderPiece(data.data);
 					}
 				}, "json").fail(function() {
@@ -154,6 +188,9 @@ $(document).ready(function() {
 	function updateAddress(id) {
 		currentID = id;
 		actionform.find("input[name=parent]").val(id);
+		$("#next .status").text("restoring...");
+		writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
+		$("#next .status").text("ready");
 		if (historyManipulated) {
 			history.replaceState({}, id, "/story/"+id);
 		} else {
@@ -221,11 +258,13 @@ $(document).ready(function() {
 					}
 					prevquery = query;
 				}
-			}).focus(function() {
-				$(this).parents(".inputlike").addClass("focus");
-			}).blur(function() {
-				$(this).parents(".inputlike").removeClass("focus");
 			});
 		});
 	}
+});
+
+$(".inputlike").find("textarea, input, button").focus(function() {
+	$(this).parents(".inputlike").addClass("focus");
+}).blur(function() {
+	$(this).parents(".inputlike").removeClass("focus");
 });

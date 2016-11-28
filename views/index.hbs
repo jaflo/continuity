@@ -44,7 +44,13 @@
 </div>
 <form action="/continue" id="next">
 	<input type="hidden" name="parent" value="{{currentID}}" />
-	<textarea name="content" cols="30" rows="5" placeholder="Write your own continuation"></textarea>
+	<div class="inputlike">
+		<textarea name="content" cols="30" rows="5" placeholder="Write your own continuation"></textarea>
+		<div class="info">
+			<div class="status"></div>
+			<a href="/help#formatting">formatting</a>
+		</div>
+	</div>
 	<button type="submit" class="primary">
 		<span class="continue">or read someone else's continuation</span>
 		<span class="write">submit your continuation</span>
