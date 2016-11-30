@@ -35,6 +35,34 @@ module.exports = function(app) {
 			});
         });
     });
+
+	app.post('/savefragment', function(req, res) {
+		if(req.user) {
+			req.assert('content', 'Story content is required').notEmpty();
+			req.assert('shortID', 'Story ID is required').notEmpty();
+			var errors = req.validationErrors();
+			if(errors) {
+				tools.failRequest(req, res, errors);
+			} else {
+				User.findOneAndUpdate({
+					'shortID': req.user.shortID,
+					'incompletestories.parent': req.body.shortID
+				}, {
+					$set: {
+						'incompletestories.$.text': req.content
+					}
+				}).exec()
+				.then(function(status) {
+					tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
+				})
+				.catch(function(err) {
+					tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
+				});
+			}
+		} else {
+			tools.failRequest(req, res, "Log in to save a story");
+		}
+	});
 };
 
 // methods

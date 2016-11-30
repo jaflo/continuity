@@ -1,19 +1,14 @@
 module.exports = {
 	completeRequest: function(req, res, data, redirect, success) {
-		console.log({
-			status: "success",
-			message: success,
-			data: data || false
-		});
 		if (req.xhr) {
 			res.json({
 				status: "success",
 				message: success,
-				data: data || false
+				data: data
 			});
 		} else {
 			if (success) req.flash("success", success);
-			res.redirect(redirect || "back");
+			res.redirect(redirect);
 		}
 		return;
 	},
