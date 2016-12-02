@@ -5,6 +5,8 @@ var tools = require('../config/tools.js');
 module.exports = function(app) {
     app.get('/', function(req, res, next) {
 		var incompletestory;
+		if(req.user)console.log("INCOMPLETE STORIES:");
+		if(req.user)console.log(req.user.incompletestories);
 		if (req.user) {
 			var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
 			for(var i = 0; i < arrayofstories.length; i++) {
@@ -61,9 +63,16 @@ module.exports = function(app) {
 					if(req.user.incompletestories[i].parent == req.body.parent) found = true;
 				}
 				if(found) {
+					if(/^[\s\n]*$/.test(req.body.content)) {
+						var query = {'shortID': req.user.shortID};
+						update = {$pull: {'incompletestories': {'parent': req.body.parent}}};
+					} else {
+						var query = {'shortID': req.user.shortID, 'incompletestories.parent': req.body.parent};
+						var update = {$set: {'incompletestories.$.text': req.body.content}};
+					}
 					User.findOneAndUpdate(
-						{'shortID': req.user.shortID, 'incompletestories.parent': req.body.parent},
-						{$set: {'incompletestories.$.text': req.body.content}}
+						query,
+						update
 					).exec()
 					.then(function(status) {
 						tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
@@ -72,7 +81,7 @@ module.exports = function(app) {
 						console.log(err);
 						tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
 					});
-				} else {
+				} else if(!(/^[\s\n]*$/.test(req.body.content))){
 					User.findOneAndUpdate(
 				        {'shortID': req.user.shortID},
 				        {$push: {incompletestories: {parent: req.body.parent, text: req.body.content}}},
@@ -85,6 +94,8 @@ module.exports = function(app) {
 						console.log(err);
 						tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
 					});
+				} else {
+					tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
 				}
 			}
 		} else {

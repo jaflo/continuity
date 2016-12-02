@@ -160,14 +160,12 @@ function attemptCreation(req, res, shortID) {
 						display: req.user.displayname,
 						emoji: req.user.emoji
 					};
-					User.findOneAndUpdate({
-						'shortID': req.user.shortID,
-						'incompletestories.parent': req.body.parent
-					}, {
-						$set: {
-							'incompletestories.$.text': ""
-						}
-					}).exec()
+					var query = {'shortID': req.user.shortID};
+					update = {$pull: {'incompletestories': {'parent': req.body.parent}}};
+					User.findOneAndUpdate(
+						{'shortID': req.user.shortID},
+						{$pull: {'incompletestories': {'parent': req.body.parent}}}
+					).exec()
 					.then(function(status) {
 						tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
 					})
