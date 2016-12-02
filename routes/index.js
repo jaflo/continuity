@@ -25,6 +25,10 @@ module.exports = function(app) {
 		});
     });
 
+	app.get('/help', function(req, res, next) {
+		res.render('help');
+	});
+
     app.get('/story/:id', function(req, res, next) {
 		if (req.params.id.length !== 5) next();
 		else if (req.params.id === '00000') res.redirect('/');
