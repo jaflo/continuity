@@ -5,7 +5,8 @@ $(document).ready(function() {
 		tofocus = $(".getfocus"), count = 0, writesaver,
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
-		valuechange = "change keyup keydown keypress";
+		valuechange = "change keyup keydown keypress",
+		localstore = typeof(Storage) !== "undefined";
 
 	while (tofocus.val() && count < 10) {
 		tofocus = tofocus.nextAll("input, select, textarea").first();
@@ -40,46 +41,53 @@ $(document).ready(function() {
 		}
 	});
 
-	if (typeof(Storage) !== "undefined") {
-		writestoryarea.on(valuechange, function(e) {
-			var nowText = $(this).val();
-			if (prevText != nowText) {
-				actionform.toggleClass("hastext", nowText.length > 0);
-				$("main").append($("<div id=tester class=inputlike>").text(nowText));
-				var determinedheight = $("#tester").innerHeight() + 30;
-				writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
-				$("#tester").remove();
-				if (!e.isTrigger) {
-					clearTimeout(writesaver);
-					$("#next .status").text("waiting");
-					writesaver = setTimeout(function() {
-						if (nowText == "") {
-							$("#next .status").text("clearing...");
-							localStorage.removeItem("save_"+currentID);
-							$("#next .status").text("cleared");
-						} else {
-							$("#next .status").text("saving...");
-							localStorage.setItem("save_"+currentID, nowText);
-							$("#next .status").text("saved");
-						}
-						/*$.post("/save", $("#next").serialize(), function(data) {
+	writestoryarea.on(valuechange, function(e) {
+		var nowText = $(this).val();
+		if (prevText != nowText) {
+			actionform.toggleClass("hastext", nowText.length > 0);
+			$("main").append($("<div id=tester class=inputlike>").text(nowText));
+			var determinedheight = $("#tester").innerHeight() + 30;
+			writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
+			$("#tester").remove();
+			if (!e.isTrigger) {
+				clearTimeout(writesaver);
+				$("#next .status").text("waiting");
+				writesaver = setTimeout(function() {
+					if (nowText == "") {
+						$("#next .status").text("clearing...");
+						if (localstore) localStorage.removeItem("save_"+currentID);
+						$.post("/savefragment", $("#next").serialize(), function(data) {
 							if (data.status == "failed") {
-								$("#next .status").text("failed "+data.message);
+								$("#next .status").text("failed");
+								message(data.message, "Clear failed");
+							} else {
+								$("#next .status").text("cleared");
+							}
+						}, "json").fail(function() {
+							$("#next .status").text("failed");
+						});
+					} else {
+						$("#next .status").text("saving...");
+						if (localstore) localStorage.setItem("save_"+currentID, nowText);
+						$.post("/savefragment", $("#next").serialize(), function(data) {
+							if (data.status == "failed") {
+								$("#next .status").text("failed");
+								message(data.message, "Save failed");
 							} else {
 								$("#next .status").text("saved");
 							}
 						}, "json").fail(function() {
 							$("#next .status").text("failed");
-						});*/
-					}, 1000);
-				}
+						});
+					}
+				}, 1000);
 			}
-			prevText = nowText;
-		});
-		$("#next .status").text("restoring...");
-		writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
-		$("#next .status").text("ready");
-	}
+		}
+		prevText = nowText;
+	});
+	$("#next .status").text("restoring...");
+	if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
+	$("#next .status").text("ready");
 
 	actionform.submit(function(e) {
 		if (!$(this).find("button").attr("disabled")) {
@@ -90,7 +98,7 @@ $(document).ready(function() {
 						message(data.message, "Failed to create");
 					} else {
 						writestoryarea.val("");
-						localStorage.removeItem("save_"+currentID);
+						if (localstore) localStorage.removeItem("save_"+currentID);
 						renderPiece(data.data);
 					}
 				}, "json").fail(function() {
@@ -182,15 +190,16 @@ $(document).ready(function() {
 			newSnippet.removeClass("hidden");
 			$("#story").height("auto");
 		}, 300);
+		$("#next .status").text("restoring...");
+		if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
+		if (piece.storyfragment) writestoryarea.val(piece.storyfragment || "").change();
+		$("#next .status").text("ready");
 		return false;
 	}
 
 	function updateAddress(id) {
 		currentID = id;
 		actionform.find("input[name=parent]").val(id);
-		$("#next .status").text("restoring...");
-		writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
-		$("#next .status").text("ready");
 		if (historyManipulated) {
 			history.replaceState({}, id, "/story/"+id);
 		} else {
