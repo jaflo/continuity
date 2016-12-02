@@ -4,11 +4,23 @@ var tools = require('../config/tools.js');
 
 module.exports = function(app) {
     app.get('/', function(req, res, next) {
+		var incompletestory;
+		if (req.user) {
+			var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
+			for(var i = 0; i < arrayofstories.length; i++) {
+				var element = arrayofstories[i];
+				if(element.parent == req.params.id) {
+					incompletestory = element.text;
+					i = arrayofstories.length;
+				}
+			}
+		}
 		load(req, res, '00000', function(stories, story) {
 			var lastStory = stories[stories.length-1];
 			res.render('index', {
 				stories: stories,
-				currentID: story.shortID
+				currentID: story.shortID,
+				storyfragment: incompletestory
 			});
 		});
     });
@@ -31,14 +43,14 @@ module.exports = function(app) {
 			var lastStory = stories[stories.length-1];
 			res.render('index', {
 				stories: stories,
-				currentID: story.shortID
+				currentID: story.shortID,
+				storyfragment: incompletestory
 			});
         });
     });
 
 	app.post('/savefragment', function(req, res) {
 		if(req.user) {
-			req.assert('content', 'Story content is required').notEmpty();
 			req.assert('shortID', 'Story ID is required').notEmpty();
 			var errors = req.validationErrors();
 			if(errors) {
