@@ -51,14 +51,14 @@ module.exports = function(app) {
 
 	app.post('/savefragment', function(req, res) {
 		if(req.user) {
-			req.assert('shortID', 'Story ID is required').notEmpty();
+			req.assert('parent', 'Story ID is required').notEmpty();
 			var errors = req.validationErrors();
 			if(errors) {
 				tools.failRequest(req, res, errors);
 			} else {
 				User.findOneAndUpdate({
 					'shortID': req.user.shortID,
-					'incompletestories.parent': req.body.shortID
+					'incompletestories.parent': req.body.parent
 				}, {
 					$set: {
 						'incompletestories.$.text': req.content

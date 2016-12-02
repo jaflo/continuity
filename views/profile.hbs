@@ -13,8 +13,25 @@
 		created an account {{{timestamp createdat}}}
 	{{/if}}
 </div>
+
+<h3>Starred</h3>
+{{#if starred}}
+<div class="listing">
+	{{#each starred}}
+	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
+		{{content}}
+	</a>
+	{{/each}}
+</div>
+{{else}}
+<div class="empty listing">
+	Star some stories!
+</div>
+{{/if}}
+
+<h3>Stories</h3>
 {{#if numberofstories}}
-<div id="listing">
+<div class="listing">
 	{{#each stories}}
 	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
 		{{content}}
@@ -22,8 +39,9 @@
 	{{/each}}
 </div>
 {{else}}
-<div id="listing" class="empty">
+<div class="empty listing">
 	Check back later!
 </div>
 {{/if}}
+
 {{/if}}
