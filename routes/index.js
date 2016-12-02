@@ -61,7 +61,7 @@ module.exports = function(app) {
 					'incompletestories.parent': req.body.shortID
 				}, {
 					$set: {
-						'incompletestories.$.text': req.content
+						'incompletestories.$.text': req.body.content
 					}
 				}).exec()
 				.then(function(status) {

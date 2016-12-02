@@ -160,7 +160,21 @@ function attemptCreation(req, res, shortID) {
 						display: req.user.displayname,
 						emoji: req.user.emoji
 					};
-					tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
+					User.findOneAndUpdate({
+						'shortID': req.user.shortID,
+						'incompletestories.parent': req.body.parent
+					}, {
+						$set: {
+							'incompletestories.$.text': ""
+						}
+					}).exec()
+					.then(function(status) {
+						tools.completeRequest(req, res, newObject, '/story/' + shortID, "Save successful!");
+					})
+					.catch(function(err) {
+						console.log(error);
+						tools.failRequest(req, res, "Internal Error: Unable to create story");
+					});
 				}
 			});
 		}
