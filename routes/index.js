@@ -9,7 +9,7 @@ module.exports = function(app) {
 			var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
 			for(var i = 0; i < arrayofstories.length; i++) {
 				var element = arrayofstories[i];
-				if(element.parent == req.params.id) {
+				if(element.parent == "00000") {
 					incompletestory = element.text;
 					i = arrayofstories.length;
 				}
@@ -56,20 +56,36 @@ module.exports = function(app) {
 			if(errors) {
 				tools.failRequest(req, res, errors);
 			} else {
-				User.findOneAndUpdate({
-					'shortID': req.user.shortID,
-					'incompletestories.parent': req.body.parent
-				}, {
-					$set: {
-						'incompletestories.$.text': req.body.content
-					}
-				}).exec()
-				.then(function(status) {
-					tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
-				})
-				.catch(function(err) {
-					tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
-				});
+				var found = false;
+				for(var i = 0; i < req.user.incompletestories.length; i++) {
+					if(req.user.incompletestories[i].parent == req.body.parent) found = true;
+				}
+				if(found) {
+					User.findOneAndUpdate(
+						{'shortID': req.user.shortID, 'incompletestories.parent': req.body.parent},
+						{$set: {'incompletestories.$.text': req.body.content}}
+					).exec()
+					.then(function(status) {
+						tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
+					})
+					.catch(function(err) {
+						console.log(err);
+						tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
+					});
+				} else {
+					User.findOneAndUpdate(
+				        {'shortID': req.user.shortID},
+				        {$push: {incompletestories: {parent: req.body.parent, text: req.body.content}}},
+				        {safe: true, upsert: true, new : true}
+				    ).exec()
+					.then(function(model) {
+						tools.completeRequest(req, res, null, "back", "Successfully saved fragment");
+					})
+					.catch(function(err) {
+						console.log(err);
+						tools.failRequest(req, res, "Internal Error: Unable to save story fragment");
+					});
+				}
 			}
 		} else {
 			tools.failRequest(req, res, "Log in to save a story");
