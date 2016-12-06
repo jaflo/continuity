@@ -101,7 +101,7 @@ module.exports = function(app) {
 	});
 
 	app.post('/delete', function(req, res) {
-		if(!req.user) tools.failRequest(req, res, "Log in to delete an account");
+		if(!req.user) tools.failRequest(req, res, "Log in to delete a story");
 		else if(!req.body.shortID) tools.failRequest(req, res, "Provide a story to delete");
 		else {
 			Story.find({shortID: req.body.shortID}).exec()
@@ -110,7 +110,7 @@ module.exports = function(app) {
 					tools.failRequest(req, res, "This story does not exist");
 					return -1;
 				} else if(story.auther != req.user.shortID) {
-					tools.failRequest(req, res, "You do not have permission to delete this file");
+					tools.failRequest(req, res, "You do not have permission to delete this story");
 					return -1;
 				} else {
 					return Story.count({parent: story.shortID}).exec()
@@ -122,16 +122,50 @@ module.exports = function(app) {
 			.then(function(count) {
 				if(count == -1) return null;
 				else if(count != 0) {
-					tools.failRequest(req, res, "You cannot delete a post with children");
+					tools.failRequest(req, res, "You cannot delete a story with children");
 				} else {
 					return Story.remove({shortID: req.body.shortID}).exec()
 					.then(function(status) {
-						tools.completeRequest(req, res, null, "back", "Successfully deleted post");
+						tools.completeRequest(req, res, null, "/story/"+status.parent, "Successfully deleted story");
 					});
 				}
 			});
 		}
 	});
+
+	app.post('/edit', function(req, res) {
+		if(!req.user) tools.failRequest(req, res, "Log in to delete a story");
+		else if(!req.body.shortID) tools.failRequest(req, res, "Provide a story to delete");
+		else {
+			Story.find({shortID: req.body.shortID}).exec()
+			.then(function(story) {
+				if(story == null) {
+					tools.failRequest(req, res, "This story does not exist");
+					return -1;
+				} else if(story.auther != req.user.shortID) {
+					tools.failRequest(req, res, "You do not have permission to edit this story");
+					return -1;
+				} else {
+					return Story.count({parent: story.shortID}).exec()
+					.then(function(count) {
+						return count;
+					});
+				}
+			})
+			.then(function(count) {
+				if(count == -1) return null;
+				else if(count != 0) {
+					tools.failRequest(req, res, "You cannot edit a story with children");
+				} else {
+					return Story.findOneAndUpdate({shortID: req.body.shortID}, {$set: {'content': req.body.contents}}).exec()
+					.then(function(status) {
+						tools.completeRequest(req, res, null, "/story/"+status.shortID, "Successfully editted story");
+					});
+				}
+			});
+		}
+	});
+
 };
 
 function attemptCreation(req, res, shortID) {
