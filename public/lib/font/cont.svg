@@ -1,0 +1,34 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2016 by original authors @ fontello.com</metadata>
+<defs>
+<font id="cont" horiz-adv-x="1000" >
+<font-face font-family="cont" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="close" unicode="&#xe800;" d="M791 582l-232-232 232-232-59-59-232 232-232-232-59 59 232 232-232 232 59 59 232-232 232 232z" horiz-adv-x="1000" />
+
+<glyph glyph-name="rewind" unicode="&#xe801;" d="M479 350l355 250v-500z m-20-250l-355 250 355 250v-500z" horiz-adv-x="1000" />
+
+<glyph glyph-name="star" unicode="&#xe802;" d="M500 131l-258-156 69 293-227 197 299 26 117 275 117-275 299-26-226-197 68-293z" horiz-adv-x="1000" />
+
+<glyph glyph-name="star_border" unicode="&#xe803;" d="M500 207l156-93-41 177 139 122-184 15-70 168-70-168-184-15 139-122-41-177z m416 258l-226-197 68-293-258 156-258-156 69 293-227 197 299 26 117 275 117-275z" horiz-adv-x="1000" />
+
+<glyph glyph-name="edit" unicode="&#xe804;" d="M863 557l-76-76-156 156 76 76c16 16 43 16 59 0l97-97c16-16 16-43 0-59z m-738-426l461 461 156-156-461-461h-156v156z" horiz-adv-x="1000" />
+
+<glyph glyph-name="delete" unicode="&#xe805;" d="M791 684v-84h-582v84h145l43 41h207l43-41h144z m-541-625v500h500v-500c0-45-39-84-84-84h-332c-45 0-84 39-84 84z" horiz-adv-x="1000" />
+
+<glyph glyph-name="info" unicode="&#xe806;" d="M459 475v84h82v-84h-82z m41-459c184 0 334 150 334 334s-150 334-334 334-334-150-334-334 150-334 334-334z m0 750c231 0 416-185 416-416s-185-416-416-416-416 186-416 416 186 416 416 416z m-41-625v250h82v-250h-82z" horiz-adv-x="1000" />
+
+<glyph glyph-name="message" unicode="&#xe807;" d="M750 516v84h-500v-84h500z m0-125v84h-500v-84h500z m0-125v84h-500v-84h500z m84 500c45 0 82-37 82-82v-500c0-45-37-84-82-84h-584l-166-166v750c0 45 37 82 82 82h668z" horiz-adv-x="1000" />
+
+<glyph glyph-name="check" unicode="&#xe808;" d="M375 176l441 442 59-59-500-500-232 232 58 59z" horiz-adv-x="1000" />
+
+<glyph glyph-name="face" unicode="&#xe809;" d="M500 16c184 0 334 150 334 334 0 33-6 65-14 94-29-8-60-10-93-10-141 0-264 68-340 176-41-100-121-182-219-225-2-12-2-23-2-35 0-184 150-334 334-334z m0 750c231 0 416-185 416-416s-185-416-416-416-416 186-416 416 186 416 416 416z m125-406c29 0 53-22 53-51s-24-53-53-53-53 24-53 53 24 51 53 51z m-250 0c29 0 53-22 53-51s-24-53-53-53-53 24-53 53 24 51 53 51z" horiz-adv-x="1000" />
+
+<glyph glyph-name="flag" unicode="&#xe80a;" d="M600 600h234v-416h-293l-16 82h-234v-291h-82v709h375z" horiz-adv-x="1000" />
+
+<glyph glyph-name="announcement" unicode="&#xe80b;" d="M541 225v84h-82v-84h82z m0 166v250h-82v-250h82z m293 375c45 0 82-37 82-82v-500c0-45-37-84-82-84h-584l-166-166v750c0 45 37 82 82 82h668z" horiz-adv-x="1000" />
+</font>
+</defs>
+</svg>

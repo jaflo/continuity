@@ -6,7 +6,8 @@ $(document).ready(function() {
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
 		valuechange = "change keyup keydown keypress",
-		localstore = typeof(Storage) !== "undefined";
+		localstore = typeof(Storage) !== "undefined",
+		radialmenu = $("#radial"), radialopen = new Date(), radialclose;
 
 	while (tofocus.val() && count < 10) {
 		tofocus = tofocus.nextAll("input, select, textarea").first();
@@ -134,29 +135,14 @@ $(document).ready(function() {
 
 	function attachEventHandlers(elements) {
 		$(elements).not(".master").each(function() {
-			var element = $(this),
-				id = element.attr("id").replace("piece", "");
-			element.find(".star").click(function() {
-				var myself = $(this);
-				$.post(myself.attr("href"), {
-					id: id
-				}, function(data) {
-					if (data.status == "failed") {
-						message(data.message, "Failed to star");
-					} else {
-						myself.find("i").text(data.data.starred ? "🌟" : "⭐");
-						myself.find("span").text(data.data.starred ? "unstar" : "star");
-						myself.attr("href", data.data.starred ? "/unstar" : "/star");
-					}
-				}, "json");
-				return false;
-			});
-			element.find(".rewind").click(function() {
-				if (historyManipulated) window.location.replace("/story/"+id);
-				else window.location = "/story/"+id;
-				return false;
-			});
-			element.find(".options a").focus(function() {
+			var element = $(this);
+			element.mousedown(function(e) {
+				if (radialmenu.is(":visible")) hideMenu();
+				else if (!$(e.target).is("a, a *") && e.which == 1) showMenu(e.pageX-parseInt($("#wrapper").css("padding-left")), e.pageY, element);
+			}).on("touchstart", function(e) {
+				if (radialmenu.is(":visible")) hideMenu();
+				else if (!$(e.target).is("a, a *")) showMenu(e.originalEvent.touches[0].pageX-2*parseInt($("#wrapper").css("padding-left")), e.originalEvent.touches[0].pageY, element);
+			}).find(".options a").focus(function() {
 				element.addClass("hover");
 			}).blur(function() {
 				element.removeClass("hover");
@@ -166,14 +152,74 @@ $(document).ready(function() {
 
 	attachEventHandlers("#story .piece");
 
+	function showMenu(x, y, element) {
+		radialopen = new Date();
+		$("body").addClass("dragging");
+		var id = element.attr("id").replace("piece", "");
+		radialmenu.find("a, div").unbind().on("mouseup touchend", function() {
+			if (new Date() - radialopen > 300) {
+				// it's a drag!
+				$(this).click();
+			} else {
+				$("body").removeClass("dragging");
+			}
+		}).click(function() {
+			hideMenu();
+		});
+		$(document).unbind("mouseup touchend").on("mouseup touchend", function(e) {
+			if (new Date() - radialopen > 300 && !$(e.target).is("#radial, #radial *")) hideMenu();
+		});
+		radialmenu.find(".close").click(hideMenu);
+		radialmenu.find(".star").click(function(e) {
+			var myself = $(this);
+			$.post(myself.attr("href"), {
+				id: id
+			}, function(data) {
+				if (data.status == "failed") {
+					message(data.message, "Failed to star");
+				} else {
+					element.toggleClass("starred", data.data.starred);
+				}
+			}, "json");
+			e.preventDefault();
+		}).attr("href", "/"+(element.hasClass("starred") ? "unstar" : "star"))
+		.find("i").removeClass().addClass("icon-star"+(element.hasClass("starred") ? "_border" : ""));
+		radialmenu.find(".rewind").click(function(e) {
+			if (historyManipulated) window.location.replace("/story/"+id);
+			else window.location = "/story/"+id;
+			e.preventDefault();
+		}).attr("href", "/story/"+id);
+		radialmenu.find(".author").click(function(e) {
+			window.location = $(this).attr("href");
+			e.preventDefault();
+		}).attr("href", element.find(".author").attr("href"));
+		radialmenu.hide().addClass("collapsed").css({
+			top: y,
+			left: x
+		}).outerWidth();
+		radialmenu.show().removeClass("collapsed");
+		clearTimeout(radialclose);
+	}
+
+	function hideMenu() {
+		$("body").removeClass("dragging");
+		radialmenu.addClass("collapsed");
+		radialclose = setTimeout(function() {
+			radialmenu.hide();
+		}, 500);
+	}
+
+	radialmenu.show().hide();
+
 	function renderPiece(piece) {
 		var snippet = $(".master.piece").clone();
 		snippet.removeClass("master").addClass("hidden").attr("id", "piece"+piece.shortID);
 		snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 		snippet.find(".author").find("span").text("by "+piece.author.display);
-		var staraction = piece.starred ? "unstar" : "star";
-		snippet.find(".star").attr("href", "/"+staraction).find("span").text(staraction);
-		snippet.find(".rewind").attr("href", "/story/"+piece.id);
+		snippet.toggleClass("starred", piece.starred);
+		//var staraction = piece.starred ? "unstar" : "star";
+		//snippet.find(".star").attr("href", "/"+staraction).find("span").text(staraction);
+		//snippet.find(".rewind").attr("href", "/story/"+piece.id);
 		snippet.find(".content").text(piece.content);
 		var storyHeight = $("#story").outerHeight();
 		attachEventHandlers(snippet);

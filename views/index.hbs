@@ -11,31 +11,15 @@
 				<i>😀</i>
 				<span></span>
 			</a>
-			<a href="#" class="star">
-				<i>⭐</i>
-				<span>star</span>
-			</a>
-			<a href="#" class="rewind">
-				<i>⏪</i>
-				<span>rewind</span>
-			</a>
 		</div>
 		<div class="content"></div>
 	</div>
 	{{#each stories}}
-	<div class="piece" id="piece{{shortID}}">
+	<div class="piece{{#if starred}} starred{{/if}}" id="piece{{shortID}}">
 		<div class="options">
 			<a href="/user/{{author.id}}" class="author">
 				<i>{{author.emoji}}</i>
 				<span>by {{author.display}}</span>
-			</a>
-			<a href="/{{#if starred}}un{{/if}}star" class="star">
-				<i>{{#if starred}}🌟{{else}}⭐{{/if}}</i>
-				<span>{{#if starred}}un{{/if}}star</span>
-			</a>
-			<a href="/story/{{shortID}}" class="rewind">
-				<i>⏪</i>
-				<span>rewind</span>
 			</a>
 		</div>
 		<div class="content">{{content}}</div>
@@ -56,4 +40,13 @@
 		<span class="write">submit your continuation</span>
 	</button>
 </form>
+<div id="radial" class="collapsed">
+	<a href="" class="bubble1 star"><i class="icon-star_border"></i></a>
+	<a href="" class="bubble2 rewind"><i class="icon-rewind"></i></a>
+	<a href="" class="bubble3 author"><i class="icon-face"></i></a>
+	<a href="" class="bubble4 edit"><i class="icon-edit"></i></a>
+	<a href="" class="bubble5 flag"><i class="icon-flag"></i></a>
+	<a href="" class="bubble6 info"><i class="icon-info"></i></a>
+	<div class="close"><i class="icon-close"></i></div>
+</div>
 {{/if}}

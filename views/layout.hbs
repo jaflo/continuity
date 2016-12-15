@@ -8,52 +8,54 @@
 	<script src="/lib/prefixfree-1.0.7.min.js"></script>
 </head>
 <body>
-<header>
-	<h1><a href="/">Continuity</a></h1>
-	{{#if user}}
-	<div id="user" class="loggedin">
-		Welcome back {{user.emoji}} <a href="/user/{{user.shortID}}">{{user.displayname}}</a>!
-		<a href="/logout">Log out</a>
-	</div>
-	{{else}}
-	<div id="user" class="loggedout">
-		Hi stranger! Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to star and continue stories.
-	</div>
-	{{/if}}
-</header>
-<main>
-	{{#if success}}
-		<div class="alert success">
-			<ul>
-				{{#each success}}<li>{{this}}</li>{{/each}}
-			</ul>
+<div id="wrapper">
+	<header>
+		<h1><a href="/">Continuity</a></h1>
+		{{#if user}}
+		<div id="user" class="loggedin">
+			Welcome back {{user.emoji}} <a href="/user/{{user.shortID}}">{{user.displayname}}</a>!
+			<a href="/logout">Log out</a>
 		</div>
-	{{/if}}
-	{{#if error}}
-		<div class="alert error">
-			<ul>
-				{{#each error}}<li>{{this}}</li>{{/each}}
-			</ul>
+		{{else}}
+		<div id="user" class="loggedout">
+			Hi stranger! Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to star and continue stories.
 		</div>
-	{{/if}}
-	{{{body}}}
-</main>
-<div id="message">
-	<div class="cover close"></div>
-	<div class="box">
-		<h2 class="header">
-			<span></span>
-			<div class="close">&times;</div>
-		</h2>
-		<div class="contents"></div>
-		<div class="buttons">
-			<button type="button" class="close">Okay</button>
+		{{/if}}
+	</header>
+	<main>
+		{{#if success}}
+			<div class="alert success">
+				<ul>
+					{{#each success}}<li>{{this}}</li>{{/each}}
+				</ul>
+			</div>
+		{{/if}}
+		{{#if error}}
+			<div class="alert error">
+				<ul>
+					{{#each error}}<li>{{this}}</li>{{/each}}
+				</ul>
+			</div>
+		{{/if}}
+		{{{body}}}
+	</main>
+	<div id="message">
+		<div class="cover close"></div>
+		<div class="box">
+			<h2 class="header">
+				<span></span>
+				<div class="close">&times;</div>
+			</h2>
+			<div class="contents"></div>
+			<div class="buttons">
+				<button type="button" class="close">Okay</button>
+			</div>
 		</div>
 	</div>
+	<footer>
+		&copy; 2016 &ndash; all continuations belong to their respective authors
+	</footer>
 </div>
-<footer>
-	&copy; 2016 &ndash; all continuations belong to their respective authors
-</footer>
 <script src="/lib/jquery-3.1.1.min.js"></script>
 <script src="/lib/timeago-1.5.3.min.js"></script>
 <script src="/front.js"></script>

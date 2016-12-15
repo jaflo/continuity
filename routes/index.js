@@ -47,6 +47,7 @@ module.exports = function(app) {
 		}
         load(req, res, req.params.id, function(stories, story) { // TODO: Learn if req.user updates continuously, or if we will need to use mongoose to get most current version
 			var lastStory = stories[stories.length-1];
+            stories[stories.length-1].last = true;
 			res.render('index', {
 				stories: stories,
 				currentID: story.shortID,
