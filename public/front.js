@@ -6,7 +6,7 @@ $(document).ready(function() {
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
 		valuechange = "change keyup keydown keypress",
-		localstore = typeof(Storage) !== "undefined",
+		localstore = typeof(Storage) !== "undefined", bubbleDragDlick = false,
 		radialmenu = $("#radial"), radialopen = new Date(), radialclose;
 
 	while (tofocus.val() && count < 10) {
@@ -137,9 +137,11 @@ $(document).ready(function() {
 		$(elements).not(".master").each(function() {
 			var element = $(this);
 			element.mousedown(function(e) {
+				radialmenu.removeClass("larger");
 				if (radialmenu.is(":visible")) hideMenu();
 				else if (!$(e.target).is("a, a *") && e.which == 1) showMenu(e.pageX-parseInt($("#wrapper").css("padding-left")), e.pageY, element);
 			}).on("touchstart", function(e) {
+				radialmenu.addClass("larger");
 				if (radialmenu.is(":visible")) hideMenu();
 				else if (!$(e.target).is("a, a *")) showMenu(e.originalEvent.touches[0].pageX-2*parseInt($("#wrapper").css("padding-left")), e.originalEvent.touches[0].pageY, element);
 			}).find(".options a").focus(function() {
@@ -156,17 +158,19 @@ $(document).ready(function() {
 		radialopen = new Date();
 		$("body").addClass("dragging");
 		var id = element.attr("id").replace("piece", "");
-		radialmenu.find("a, div").unbind().on("mouseup touchend", function() {
+		radialmenu.find("a, div").unbind().on("mouseup touchend", function(e) {
+			$("body").removeClass("dragging");
 			if (new Date() - radialopen > 300) {
 				// it's a drag!
 				$(this).click();
-			} else {
-				$("body").removeClass("dragging");
+				return false;
 			}
 		}).click(function() {
 			hideMenu();
 		});
 		$(document).unbind("mouseup touchend").on("mouseup touchend", function(e) {
+			radialmenu.find("a, div").unbind("mouseup touchend");
+			$("body").removeClass("dragging");
 			if (new Date() - radialopen > 300 && !$(e.target).is("#radial, #radial *")) hideMenu();
 		});
 		radialmenu.find(".close").click(hideMenu);
@@ -193,6 +197,15 @@ $(document).ready(function() {
 			window.location = $(this).attr("href");
 			e.preventDefault();
 		}).attr("href", element.find(".author").attr("href"));
+		radialmenu.find(".info").click(function(e) {
+			element.height("auto");
+			var before = element.outerHeight();
+			element.append($("<div>").addClass("injected").text("test"));
+			var after = element.outerHeight();
+			element.height(before);
+			element.addClass("highlighed").height(after);
+			e.preventDefault();
+		});//TODO .attr("href", element.find(".author").attr("href"));
 		radialmenu.hide().addClass("collapsed").css({
 			top: y,
 			left: x
