@@ -64,6 +64,11 @@ app.use(expressValidator({
 			formParam += '[' + namespace.shift() + ']';
 		}
 		return msg + " ";
+	},
+	customValidators: {
+		betweenLengths: function(str, min, max) {
+			return (str.length>=min && str.length<=max);
+		}
 	}
 }));
 

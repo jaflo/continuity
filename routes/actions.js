@@ -2,6 +2,8 @@ var User = require('../models/user.js');
 var Story = require('../models/story.js');
 var tools = require('../config/tools.js');
 var ID_LENGTH = 5;
+var MIN_LENGTH = 200;
+var MAX_LENGTH = 2000;
 
 module.exports = function(app) {
 	app.get('/next', function(req, res) {
@@ -85,6 +87,7 @@ module.exports = function(app) {
 		} else {
 			req.assert('parent', 'A parent story is required!').notEmpty();
 			req.assert('content', 'Please write something').notEmpty();
+			req.assert('content', 'Please keep your story between 200 and 2000 characters').betweenLengths(MIN_LENGTH, MAX_LENGTH);
 			var errors = req.validationErrors();
 			if(errors) {
 				tools.failRequest(req, res, errors);
@@ -134,8 +137,12 @@ module.exports = function(app) {
 	});
 
 	app.post('/edit', function(req, res) {
+		req.assert('content', 'Please keep your story between 200 and 2000 characters').betweenLengths(MIN_LENGTH, MAX_LENGTH);
+		var errors = req.validationErrors();
+
 		if(!req.user) tools.failRequest(req, res, "Log in to delete a story");
 		else if(!req.body.shortID) tools.failRequest(req, res, "Provide a story to delete");
+		else if(errors) tools.failRequest(req, res, errors);
 		else {
 			Story.find({shortID: req.body.shortID}).exec()
 			.then(function(story) {
@@ -165,7 +172,6 @@ module.exports = function(app) {
 			});
 		}
 	});
-
 };
 
 function attemptCreation(req, res, shortID) {
