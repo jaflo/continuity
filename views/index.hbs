@@ -24,10 +24,18 @@
 		</div>
 		<div class="content">{{content}}</div>
 		<div class="more">
-			created {{{timestamp createdat}}}
-			<button type="button" class="star"><i class="icon-star_border"></i> <span>10</span></button>
-			<button type="button" class="edit">edit</button>
-			<button type="button" class="flag">flag</button>
+			<div>
+				created {{{timestamp createdat}}}
+			</div>
+			<button type="button" class="rewind" title="Rewind"><i class="icon-rewind"></i></button>
+			{{#if starred}}
+			<button type="button" class="star" title="Unstar"><i class="icon-star_border"></i> <span>{{starcount}}</span></button>
+			{{else}}
+			<button type="button" class="star" title="Star"><i class="icon-star"></i> <span>{{starcount}}</span></button>
+			{{/if}}
+			<button type="button" class="edit" title="Edit"><i class="icon-edit"></i></button>
+			<button type="button" class="delete" title="Delete"><i class="icon-delete"></i></button>
+			<button type="button" class="flag" title="Report"><i class="icon-flag"></i></button>
 		</div>
 	</div>
 	{{/each}}

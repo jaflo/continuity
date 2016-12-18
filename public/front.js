@@ -6,6 +6,7 @@ $(document).ready(function() {
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
 		valuechange = "change keyup keydown keypress",
+		transitionend = "webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend",
 		localstore = typeof(Storage) !== "undefined", bubbleDragDlick = false,
 		radialmenu = $("#radial"), radialopen = new Date(), radialclose;
 
@@ -135,102 +136,63 @@ $(document).ready(function() {
 
 	function attachEventHandlers(elements) {
 		$(elements).not(".master").each(function() {
-			var element = $(this);
-			/*element.mousedown(function(e) {
-				radialmenu.removeClass("larger");
-				if (radialmenu.is(":visible")) hideMenu();
-				else if (!$(e.target).is("a, a *") && e.which == 1) showMenu(e.pageX-parseInt($("#wrapper").css("padding-left")), e.pageY, element);
-			}).on("touchstart", function(e) {
-				radialmenu.addClass("larger");
-				if (radialmenu.is(":visible")) hideMenu();
-				else if (!$(e.target).is("a, a *")) showMenu(e.originalEvent.touches[0].pageX-2*parseInt($("#wrapper").css("padding-left")), e.originalEvent.touches[0].pageY, element);
-			}).find(".options a").focus(function() {
-				element.addClass("hover");
-			}).blur(function() {
-				element.removeClass("hover");
-			});*/
+			var element = $(this),
+				id = element.attr("id").replace("piece", "");
 			element.click(function() {
-				element.height("auto");
-				var before = element.outerHeight();
-				element.find(".more").show();
-				var after = element.outerHeight();
-				element.height(before);
-				element.addClass("highlighed").height(after);
+				var previous = $("#story .highlighed.piece");
+				if (!element.hasClass("highlighed")) {
+					element.height("auto");
+					var before = element.outerHeight();
+					element.find(".more").show();
+					var after = element.outerHeight();
+					element.height(before);
+					element.addClass("highlighed").height(after);
+					element.unbind(transitionend).on(transitionend, function() {
+						element.height("auto");
+					});
+					previous = previous.not("#"+element.attr("id"));
+				}
+				if (previous.length > 0) {
+					previous.height("auto");
+					var before = previous.outerHeight() - 2*parseFloat(previous.css("padding-top"));
+					previous.removeClass("highlighed").find(".more").hide();
+					var after = previous.outerHeight() - 2*parseFloat(previous.find(".more").css("padding-top"));
+					previous.find(".more").show();
+					previous.height(before);
+					previous.removeClass("highlighed");
+					previous.height(after);
+					previous.unbind(transitionend).on(transitionend, function() {
+						previous.height("auto");
+						previous.find(".more").hide();
+					});
+				}
+			});
+			element.find(".star").click(function() {
+				var myself = $(this);
+				$.post(element.hasClass("starred") ? "/unstar" : "/star", {
+					id: id
+				}, function(data) {
+					console.log(data);
+					if (data.status == "failed") {
+						message(data.message, "Failed to star");
+					} else {
+						myself.find("i").removeClass().addClass(data.data.starred ? "icon-star_border" : "icon-star");
+						element.toggleClass("starred", data.data.starred);
+						myself.find("span").text(data.message);
+						myself.attr("title", data.data.starred ? "Unstar" : "Star");
+					}
+				}, "json");
+				return false;
+			});
+			element.find(".rewind").click(function() {
+				if (historyManipulated) window.location.replace("/story/"+id);
+				else window.location = "/story/"+id;
+				return false;
 			});
 		});
 	}
 
 	attachEventHandlers("#story .piece");
-
-	/*function showMenu(x, y, element) {
-		radialopen = new Date();
-		$("body").addClass("dragging");
-		var id = element.attr("id").replace("piece", "");
-		radialmenu.find("a, div").unbind().on("mouseup touchend", function(e) {
-			$("body").removeClass("dragging");
-			if (new Date() - radialopen > 300) {
-				// it's a drag!
-				$(this).click();
-				return false;
-			}
-		}).click(function() {
-			hideMenu();
-		});
-		$(document).unbind("mouseup touchend").on("mouseup touchend", function(e) {
-			radialmenu.find("a, div").unbind("mouseup touchend");
-			$("body").removeClass("dragging");
-			if (new Date() - radialopen > 300 && !$(e.target).is("#radial, #radial *")) hideMenu();
-		});
-		radialmenu.find(".close").click(hideMenu);
-		radialmenu.find(".star").click(function(e) {
-			var myself = $(this);
-			$.post(myself.attr("href"), {
-				id: id
-			}, function(data) {
-				if (data.status == "failed") {
-					message(data.message, "Failed to star");
-				} else {
-					element.toggleClass("starred", data.data.starred);
-				}
-			}, "json");
-			e.preventDefault();
-		}).attr("href", "/"+(element.hasClass("starred") ? "unstar" : "star"))
-		.find("i").removeClass().addClass("icon-star"+(element.hasClass("starred") ? "_border" : ""));
-		radialmenu.find(".rewind").click(function(e) {
-			if (historyManipulated) window.location.replace("/story/"+id);
-			else window.location = "/story/"+id;
-			e.preventDefault();
-		}).attr("href", "/story/"+id);
-		radialmenu.find(".author").click(function(e) {
-			window.location = $(this).attr("href");
-			e.preventDefault();
-		}).attr("href", element.find(".author").attr("href"));
-		radialmenu.find(".info").click(function(e) {
-			element.height("auto");
-			var before = element.outerHeight();
-			element.append($("<div>").addClass("injected").text("test"));
-			var after = element.outerHeight();
-			element.height(before);
-			element.addClass("highlighed").height(after);
-			e.preventDefault();
-		});//TODO .attr("href", element.find(".author").attr("href"));
-		radialmenu.hide().addClass("collapsed").css({
-			top: y,
-			left: x
-		}).outerWidth();
-		radialmenu.show().removeClass("collapsed");
-		clearTimeout(radialclose);
-	}
-
-	function hideMenu() {
-		$("body").removeClass("dragging");
-		radialmenu.addClass("collapsed");
-		radialclose = setTimeout(function() {
-			radialmenu.hide();
-		}, 500);
-	}
-
-	radialmenu.show().hide();*/
 
 	function renderPiece(piece) {
 		var snippet = $(".master.piece").clone();
@@ -238,9 +200,6 @@ $(document).ready(function() {
 		snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 		snippet.find(".author").find("span").text("by "+piece.author.display);
 		snippet.toggleClass("starred", piece.starred);
-		//var staraction = piece.starred ? "unstar" : "star";
-		//snippet.find(".star").attr("href", "/"+staraction).find("span").text(staraction);
-		//snippet.find(".rewind").attr("href", "/story/"+piece.id);
 		snippet.find(".content").text(piece.content);
 		var storyHeight = $("#story").outerHeight();
 		attachEventHandlers(snippet);
@@ -284,7 +243,7 @@ $(document).ready(function() {
 		container.find(".box").addClass("enter");
 		container.find("button").focus();
 		container.find(".close").click(function() {
-			container.find(".box").on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function() {
+			container.find(".box").on(transitionend, function() {
 				container.find(".box").off();
 				container.fadeOut(100);
 			}).addClass("exit");

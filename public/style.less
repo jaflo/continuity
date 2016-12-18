@@ -300,11 +300,11 @@ h2 {
 		overflow: hidden;
 		&:target, &.highlighed {
 			background: white;
-			margin: 0 -0.4em 0.4em -0.4em;
+			margin: 0.4em -0.4em;
 			padding: 0.4em;
 			border-radius: 3px;
 			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-			@media (max-width: 30em) {
+			@media (max-width: 31em) {
 				border-radius: 0;
 			}
 		}
@@ -338,6 +338,12 @@ h2 {
 			border-top: 1px solid rgba(0,0,0,0.2);
 			color: rgba(0,0,0,0.6);
 			display: none;
+			button {
+				display: inline-block;
+				width: auto;
+				padding: @pad 2*@pad;
+				margin: @pad 0 0 0;
+			}
 		}
 	}
 	.master.piece {
