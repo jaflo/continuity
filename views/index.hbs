@@ -23,6 +23,12 @@
 			</a>
 		</div>
 		<div class="content">{{content}}</div>
+		<div class="more">
+			created {{{timestamp createdat}}}
+			<button type="button" class="star"><i class="icon-star_border"></i> <span>10</span></button>
+			<button type="button" class="edit">edit</button>
+			<button type="button" class="flag">flag</button>
+		</div>
 	</div>
 	{{/each}}
 </div>
@@ -40,13 +46,4 @@
 		<span class="write">submit your continuation</span>
 	</button>
 </form>
-<div id="radial" class="collapsed">
-	<a href="" class="bubble1 star"><i class="icon-star_border"></i></a>
-	<a href="" class="bubble2 rewind"><i class="icon-rewind"></i></a>
-	<a href="" class="bubble3 author"><i class="icon-face"></i></a>
-	<a href="" class="bubble4 edit"><i class="icon-edit"></i></a>
-	<a href="" class="bubble5 flag"><i class="icon-flag"></i></a>
-	<a href="" class="bubble6 info"><i class="icon-info"></i></a>
-	<div class="close"><i class="icon-close"></i></div>
-</div>
 {{/if}}

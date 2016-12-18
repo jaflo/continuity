@@ -304,6 +304,9 @@ h2 {
 			padding: 0.4em;
 			border-radius: 3px;
 			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+			@media (max-width: 30em) {
+				border-radius: 0;
+			}
 		}
 		&.hidden {
 			opacity: 0;
@@ -329,11 +332,12 @@ h2 {
 			line-height: 1.5;
 			word-break: break-word;
 		}
-		.injected {
+		.more {
 			margin: @pad -@pad 0 -@pad;
 			padding: @pad @pad 0 @pad;
 			border-top: 1px solid rgba(0,0,0,0.2);
 			color: rgba(0,0,0,0.6);
+			display: none;
 		}
 	}
 	.master.piece {

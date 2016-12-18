@@ -136,7 +136,7 @@ $(document).ready(function() {
 	function attachEventHandlers(elements) {
 		$(elements).not(".master").each(function() {
 			var element = $(this);
-			element.mousedown(function(e) {
+			/*element.mousedown(function(e) {
 				radialmenu.removeClass("larger");
 				if (radialmenu.is(":visible")) hideMenu();
 				else if (!$(e.target).is("a, a *") && e.which == 1) showMenu(e.pageX-parseInt($("#wrapper").css("padding-left")), e.pageY, element);
@@ -148,13 +148,21 @@ $(document).ready(function() {
 				element.addClass("hover");
 			}).blur(function() {
 				element.removeClass("hover");
+			});*/
+			element.click(function() {
+				element.height("auto");
+				var before = element.outerHeight();
+				element.find(".more").show();
+				var after = element.outerHeight();
+				element.height(before);
+				element.addClass("highlighed").height(after);
 			});
 		});
 	}
 
 	attachEventHandlers("#story .piece");
 
-	function showMenu(x, y, element) {
+	/*function showMenu(x, y, element) {
 		radialopen = new Date();
 		$("body").addClass("dragging");
 		var id = element.attr("id").replace("piece", "");
@@ -222,7 +230,7 @@ $(document).ready(function() {
 		}, 500);
 	}
 
-	radialmenu.show().hide();
+	radialmenu.show().hide();*/
 
 	function renderPiece(piece) {
 		var snippet = $(".master.piece").clone();
