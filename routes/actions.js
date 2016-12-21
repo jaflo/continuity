@@ -1,5 +1,6 @@
 var User = require('../models/user.js');
 var Story = require('../models/story.js');
+var Flag = require('../models/flag.js');
 var tools = require('../config/tools.js');
 var ID_LENGTH = 5;
 var MIN_LENGTH = 200;
@@ -87,7 +88,7 @@ module.exports = function(app) {
 		} else {
 			req.assert('parent', 'A parent story is required!').notEmpty();
 			req.assert('content', 'Please write something').notEmpty();
-			req.assert('content', 'Please keep your story between 200 and 2000 characters').betweenLengths(MIN_LENGTH, MAX_LENGTH);
+			req.assert('content', 'Please keep your story between 200 and 2000 characters').isLength({min: MIN_LENGTH, max: MAX_LENGTH});
 			var errors = req.validationErrors();
 			if(errors) {
 				tools.failRequest(req, res, errors);
@@ -99,8 +100,67 @@ module.exports = function(app) {
 	});
 
 	app.post('/flag', function(req, res) { // TODO
-		console.log("Unimplemented!");
-		res.redirect("back");
+		if(req.user) {
+			req.assert('shortID', 'Story ID is required').notEmpty();
+			req.assert('reason', 'A reason for flagging is required').notEmpty();
+			req.assert('reason', 'Reasons cannot exceed 500 characters').isLength({min: undefined, max: 500});
+			var errors = req.validationErrors();
+			if(errors) {
+				tools.failRequest(req, res, errors);
+			} else {
+				Flag.findOne({storyShortID: req.body.shortID}).exec()
+				.then(function(flag) {
+					if(flag == null) {
+						var newFlag = new Flag();
+						newFlag.storyShortID = req.body.shortID;
+						newFlag.flaggings = [{
+							reason: req.body.reason,
+							flagger: req.user.shortID,
+						}];
+						newFlag.status = "unresolved";
+						newFlag.save(function(err) {
+							if(err) {
+								console.log(err);
+								tools.failRequest(req, res, "Internal Error: Unable to flag");
+							}
+							else {
+								tools.completeRequest(req, res, null, "/story/" + req.body.shortID, "Successfully flagged");
+							}
+						});
+					}
+					else {
+						var exists = false;
+						for(var i = 0; i < flag.flaggings.length; i++) {
+							if(flag.flaggings[i].flagger == req.user.shortID) exists = true;
+						}
+						if(exists) tools.failRequest(req, res, "You've already flagged this story");
+						else {
+							Flag.findOneAndUpdate(
+						        {'storyShortID': req.body.shortID},
+						        {$push: {flaggings: {
+									reason: req.user.reason,
+									flagger: req.user.shortID
+								}}},
+						        {safe: true, upsert: true, new : true}
+						    ).exec()
+							.then(function(model) {
+								tools.completeRequest(req, res, null, "/story/" + req.body.shortID, "Successfully flagged");
+							})
+							.catch(function(err) {
+								console.log(err);
+								tools.failRequest(req, res, "Internal Error: Unable to flag");
+							});
+						}
+					}
+				})
+				.catch(function(err) {
+					console.log(err);
+					tools.failRequest(req, res, "Internal Error: Unable to flag");
+				});
+			}
+		} else {
+			tools.failRequest(req, res, "Log in to save a story");
+		}
 	});
 
 	app.post('/delete', function(req, res) {
@@ -200,8 +260,7 @@ function attemptCreation(req, res, shortID) {
 						display: req.user.displayname,
 						emoji: req.user.emoji
 					};
-					var query = {'shortID': req.user.shortID};
-					update = {$pull: {'incompletestories': {'parent': req.body.parent}}};
+
 					User.findOneAndUpdate(
 						{'shortID': req.user.shortID},
 						{$pull: {'incompletestories': {'parent': req.body.parent}}}
