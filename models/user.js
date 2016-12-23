@@ -3,6 +3,16 @@ var bcrypt = require('bcryptjs');
 
 var SALT_LEVEL = 10;
 
+var subSchema = mongoose.Schema({
+    parent: {
+        type: String,
+    },
+    text: {
+        type: String
+    }
+}, { _id : false });
+
+
 var userSchema = mongoose.Schema({
 	displayname: {
         type: String,
@@ -46,14 +56,7 @@ var userSchema = mongoose.Schema({
         type: String,
         unique: false
     }],
-    incompletestories: [{
-        parent: {
-            type: String,
-        },
-        text: {
-            type: String
-        }
-    }]
+    incompletestories: [subSchema]
 });
 
 // methods ======================

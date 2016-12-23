@@ -5,8 +5,6 @@ var tools = require('../config/tools.js');
 module.exports = function(app) {
     app.get('/', function(req, res, next) {
 		var incompletestory;
-		if(req.user)console.log("INCOMPLETE STORIES:");
-		if(req.user)console.log(req.user.incompletestories);
 		if (req.user) {
 			var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
 			for(var i = 0; i < arrayofstories.length; i++) {
