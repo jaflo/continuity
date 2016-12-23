@@ -13,6 +13,16 @@
 			</a>
 		</div>
 		<div class="content"></div>
+		<div class="more">
+			<div>
+				created {{{timestamp null}}}
+			</div>
+			<button type="button" class="rewind" title="Rewind"><i class="icon-rewind"></i></button>
+			<button type="button" class="star" title="Star"><i class="icon-star"></i> <span>0</span></button>
+			<button type="button" class="edit" title="Edit"><i class="icon-edit"></i></button>
+			<button type="button" class="delete" title="Delete"><i class="icon-delete"></i></button>
+			<button type="button" class="flag" title="Report"><i class="icon-flag"></i></button>
+		</div>
 	</div>
 	{{#each stories}}
 	<div class="piece{{#if starred}} starred{{/if}}" id="piece{{shortID}}">

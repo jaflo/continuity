@@ -27,6 +27,7 @@ module.exports = function(app) {
 							display: user.displayname,
 							emoji: user.emoji
 						};
+						story["starred"] = req.user && req.user.starred.includes(newStory.shortID);
 						tools.completeRequest(req, res, story, '/story/' + story.shortID, "Successfully retrieved story");
 					});
 				}

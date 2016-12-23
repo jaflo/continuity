@@ -2,12 +2,12 @@ $(document).ready(function() {
 	var hasSeenNewest = true,
 		historyManipulated = false,
 		currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
-		tofocus = $(".getfocus"), count = 0, writesaver,
+		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
 		valuechange = "change keyup keydown keypress",
 		transitionend = "webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend",
-		localstore = typeof(Storage) !== "undefined", bubbleDragDlick = false,
+		localstore = $("#user").hasClass("loggedout") && typeof(Storage) !== "undefined", bubbleDragDlick = false,
 		radialmenu = $("#radial"), radialopen = new Date(), radialclose;
 
 	while (tofocus.val() && count < 10) {
@@ -47,6 +47,14 @@ $(document).ready(function() {
 		var nowText = $(this).val();
 		if (prevText != nowText) {
 			actionform.toggleClass("hastext", nowText.length > 0);
+			var button = actionform.find("button");
+			if (nowText.length > 0 && nowText.length < 200) {
+				button.attr("disabled", "disabled").find(".write").text("your continuation is "+(200-nowText.length)+" characters too short");
+			} else if (nowText.length > 2000) {
+				button.attr("disabled", "disabled").find(".write").text("your continuation is "+(nowText.length-2000)+" characters too long");
+			} else {
+				button.removeAttr("disabled").find(".write").text("submit your continuation");
+			}
 			$("main").append($("<div id=tester class=inputlike>").text(nowText));
 			var determinedheight = $("#tester").innerHeight() + 30;
 			writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
@@ -57,30 +65,38 @@ $(document).ready(function() {
 				writesaver = setTimeout(function() {
 					if (nowText == "") {
 						$("#next .status").text("clearing...");
-						if (localstore) localStorage.removeItem("save_"+currentID);
-						$.post("/savefragment", $("#next").serialize(), function(data) {
-							if (data.status == "failed") {
+						if (localstore) {
+							localStorage.removeItem("save_"+currentID);
+							$("#next .status").text("cleared");
+						} else {
+							$.post("/savefragment", $("#next").serialize(), function(data) {
+								if (data.status == "failed") {
+									$("#next .status").text("failed");
+									message(data.message, "Clear failed");
+								} else {
+									$("#next .status").text("cleared");
+								}
+							}, "json").fail(function() {
 								$("#next .status").text("failed");
-								message(data.message, "Clear failed");
-							} else {
-								$("#next .status").text("cleared");
-							}
-						}, "json").fail(function() {
-							$("#next .status").text("failed");
-						});
+							});
+						}
 					} else {
 						$("#next .status").text("saving...");
-						if (localstore) localStorage.setItem("save_"+currentID, nowText);
-						$.post("/savefragment", $("#next").serialize(), function(data) {
-							if (data.status == "failed") {
+						if (localstore) {
+							localStorage.setItem("save_"+currentID, nowText);
+							$("#next .status").text("saved");
+						} else {
+							$.post("/savefragment", $("#next").serialize(), function(data) {
+								if (data.status == "failed") {
+									$("#next .status").text("failed");
+									message(data.message, "Save failed");
+								} else {
+									$("#next .status").text("saved");
+								}
+							}, "json").fail(function() {
 								$("#next .status").text("failed");
-								message(data.message, "Save failed");
-							} else {
-								$("#next .status").text("saved");
-							}
-						}, "json").fail(function() {
-							$("#next .status").text("failed");
-						});
+							});
+						}
 					}
 				}, 1000);
 			}
@@ -88,7 +104,7 @@ $(document).ready(function() {
 		prevText = nowText;
 	});
 	$("#next .status").text("restoring...");
-	if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
+	writestoryarea.val(writestoryarea.val() || localStorage.getItem("save_"+currentID)).change();
 	$("#next .status").text("ready");
 
 	actionform.submit(function(e) {
@@ -167,6 +183,12 @@ $(document).ready(function() {
 					});
 				}
 			});
+			element.find("time").timeago();
+			element.find(".rewind").click(function() {
+				if (historyManipulated) window.location.replace("/story/"+id);
+				else window.location = "/story/"+id;
+				return false;
+			});
 			element.find(".star").click(function() {
 				var myself = $(this);
 				$.post(element.hasClass("starred") ? "/unstar" : "/star", {
@@ -184,11 +206,6 @@ $(document).ready(function() {
 				}, "json");
 				return false;
 			});
-			element.find(".rewind").click(function() {
-				if (historyManipulated) window.location.replace("/story/"+id);
-				else window.location = "/story/"+id;
-				return false;
-			});
 		});
 	}
 
@@ -200,22 +217,25 @@ $(document).ready(function() {
 		snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 		snippet.find(".author").find("span").text("by "+piece.author.display);
 		snippet.toggleClass("starred", piece.starred);
+		snippet.find(".star").attr("title", piece.starred ? "Unstar" : "Star").find("span").text(piece.starcount);
+		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
-		var storyHeight = $("#story").outerHeight();
+		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
+		var storyHeight = storyarea.outerHeight();
 		attachEventHandlers(snippet);
-		$("#story").append(snippet);
+		storyarea.append(snippet);
 		var newStoryHeight = $("#story").outerHeight(),
 			newSnippet = $("#story .piece").last();
-		$("#story").height(storyHeight).outerHeight();
-		$("#story").height(newStoryHeight);
+		storyarea.height(storyHeight).outerHeight();
+		storyarea.height(newStoryHeight);
 		$("html, body").stop().animate({
 			scrollTop: newSnippet.offset().top-200
 		}, 300, "swing");
 		updateAddress(piece.shortID);
-		setTimeout(function() {
+		storyarea.on(transitionend, function() {
 			newSnippet.removeClass("hidden");
 			$("#story").height("auto");
-		}, 300);
+		});
 		$("#next .status").text("restoring...");
 		if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
 		if (piece.storyfragment) writestoryarea.val(piece.storyfragment || "").change();
@@ -296,10 +316,11 @@ $(document).ready(function() {
 			});
 		});
 	}
-});
 
-$(".inputlike").find("textarea, input, button").focus(function() {
-	$(this).parents(".inputlike").addClass("focus");
-}).blur(function() {
-	$(this).parents(".inputlike").removeClass("focus");
+	$(".inputlike").find("textarea, input, button").focus(function() {
+		$(this).parents(".inputlike").addClass("focus");
+	}).blur(function() {
+		$(this).parents(".inputlike").removeClass("focus");
+	});
+
 });
