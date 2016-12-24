@@ -56,7 +56,11 @@ var userSchema = mongoose.Schema({
         type: String,
         unique: false
     }],
-    incompletestories: [subSchema]
+    incompletestories: [subSchema],
+	admin: {
+		type: Boolean,
+		default: false
+	}
 });
 
 // methods ======================

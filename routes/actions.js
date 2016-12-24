@@ -3,7 +3,7 @@ var Story = require('../models/story.js');
 var Flag = require('../models/flag.js');
 var tools = require('../config/tools.js');
 var ID_LENGTH = 5;
-var MIN_LENGTH = 200;
+var MIN_LENGTH = 2;
 var MAX_LENGTH = 2000;
 
 module.exports = function(app) {
@@ -28,7 +28,7 @@ module.exports = function(app) {
 							display: user.displayname,
 							emoji: user.emoji
 						};
-						story["starred"] = req.user && req.user.starred.includes(newStory.shortID);
+						story["starred"] = req.user && req.user.starred.includes(story.shortID);
 						tools.completeRequest(req, res, story, '/story/' + story.shortID, "Successfully retrieved story");
 					});
 				}
@@ -89,7 +89,7 @@ module.exports = function(app) {
 		} else {
 			req.assert('parent', 'A parent story is required!').notEmpty();
 			req.assert('content', 'Please write something').notEmpty();
-			req.assert('content', 'Please keep your story between 200 and 2000 characters').isLength({min: MIN_LENGTH, max: MAX_LENGTH});
+			req.assert('content', 'Please keep your story between '+MIN_LENGTH+' and '+MAX_LENGTH+' characters').isLength({min: MIN_LENGTH, max: MAX_LENGTH});
 			var errors = req.validationErrors();
 			if(errors) {
 				tools.failRequest(req, res, errors);

@@ -9,11 +9,16 @@ for (var key in emojimap) {
 }
 
 module.exports = function(app) {
-	app.post('/login', passport.authenticate('local-login', {
-		successRedirect: '/', // redirect to the secure profile section
-		failureRedirect: '/login', // redirect back to the signup page if there is an error
-		failureFlash: true // allow flash messages
-	}));
+	app.post("/login", passport.authenticate('local-login',
+	    { failureRedirect: '/login',
+	      failureFlash: true }), function(req, res) {
+	        if (req.body.remember) {
+	          req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
+	        } else {
+	          req.session.cookie.expires = false; // Cookie expires at end of session
+	        }
+	      res.redirect('/');
+	});
 
 	app.get('/login', function(req, res, next) {
 		res.render('login');
