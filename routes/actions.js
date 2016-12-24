@@ -3,7 +3,7 @@ var Story = require('../models/story.js');
 var Flag = require('../models/flag.js');
 var tools = require('../config/tools.js');
 var ID_LENGTH = 5;
-var MIN_LENGTH = 2;
+var MIN_LENGTH = 200;
 var MAX_LENGTH = 2000;
 
 module.exports = function(app) {
