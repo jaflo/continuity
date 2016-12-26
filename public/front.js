@@ -5,10 +5,9 @@ $(document).ready(function() {
 		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
-		valuechange = "change keyup keydown keypress",
+		valuechange = "change keyup keydown keypress", canclose = true,
 		transitionend = "webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend",
-		localstore = $("#user").hasClass("loggedout") && typeof(Storage) !== "undefined", bubbleDragDlick = false,
-		radialmenu = $("#radial"), radialopen = new Date(), radialclose;
+		localstore = $("#user").hasClass("loggedout") && typeof(Storage) !== "undefined";
 
 	while (tofocus.val() && count < 10) {
 		tofocus = tofocus.nextAll("input, select, textarea").first();
@@ -43,6 +42,13 @@ $(document).ready(function() {
 		}
 	});
 
+	function adjustHeight(thing) {
+		$("main").append($("<div id=tester class=inputlike>").text(thing.val()));
+		var determinedheight = $("#tester").innerHeight() + 30;
+		thing.height(determinedheight > origboxheight ? determinedheight : "");
+		$("#tester").remove();
+	}
+
 	writestoryarea.on(valuechange, function(e) {
 		var nowText = $(this).val();
 		if (prevText != nowText) {
@@ -55,10 +61,7 @@ $(document).ready(function() {
 			} else {
 				button.removeAttr("disabled").find(".write").text("submit your continuation");
 			}
-			$("main").append($("<div id=tester class=inputlike>").text(nowText));
-			var determinedheight = $("#tester").innerHeight() + 30;
-			writestoryarea.height(determinedheight > origboxheight ? determinedheight : "");
-			$("#tester").remove();
+			adjustHeight(writestoryarea);
 			if (!e.isTrigger) {
 				clearTimeout(writesaver);
 				$("#next .status").text("waiting");
@@ -133,6 +136,7 @@ $(document).ready(function() {
 					} else {
 						renderPiece(data.data);
 					}
+					actionform.find("textarea, button").removeAttr("disabled");
 				}, "json").fail(function() {
 					actionform.find("textarea, button").removeAttr("disabled");
 				});
@@ -155,11 +159,12 @@ $(document).ready(function() {
 			var element = $(this),
 				id = element.attr("id").replace("piece", "");
 			element.click(function() {
+				if (!canclose) return;
 				var previous = $("#story .highlighed.piece");
 				if (!element.hasClass("highlighed")) {
 					element.height("auto");
 					var before = element.outerHeight();
-					element.find(".more").show();
+					element.find(".controls").show();
 					var after = element.outerHeight();
 					element.height(before);
 					element.addClass("highlighed").height(after);
@@ -170,16 +175,21 @@ $(document).ready(function() {
 				}
 				if (previous.length > 0) {
 					previous.height("auto");
+					var visible = previous.find("> div:visible"), hidden = previous.find("> div:hidden");
 					var before = previous.outerHeight() - 2*parseFloat(previous.css("padding-top"));
-					previous.removeClass("highlighed").find(".more").hide();
-					var after = previous.outerHeight() - 2*parseFloat(previous.find(".more").css("padding-top"));
-					previous.find(".more").show();
+					previous.removeClass("highlighed").find(".more, .editor").hide();
+					previous.find(".content").show();
+					var after = previous.outerHeight() - 2*parseFloat(previous.find(".controls").css("padding-top"));
+					visible.show();
+					hidden.hide();
 					previous.height(before);
 					previous.removeClass("highlighed");
 					previous.height(after);
 					previous.unbind(transitionend).on(transitionend, function() {
 						previous.height("auto");
-						previous.find(".more").hide();
+						previous.find(".editor, .contextual").remove();
+						previous.find(".content").show();
+						previous.find(".controls").hide();
 					});
 				}
 			});
@@ -204,6 +214,76 @@ $(document).ready(function() {
 						myself.attr("title", data.data.starred ? "Unstar" : "Star");
 					}
 				}, "json");
+				return false;
+			});
+			element.find(".edit").click(function() {
+				var editable = $("<div class=editor><textarea>");
+				editable.find("textarea").val(element.find(".content").text());
+				element.find(".content").hide().after(editable);
+				editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
+				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+				bar.find("div").text("after saving, your edit cannot be undone");
+				bar.find("button").remove();
+				bar.append(button.clone().addClass("cancel").attr("title", "Discard changes"));
+				bar.find("button.cancel").click(function() {
+					canclose = true;
+				}).find("i").removeClass().addClass("icon-close");
+				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Save changes"));
+				bar.find("button.confirm").click(function() {
+					if (!$(this).attr("disabled")) {
+						$.post("/edit", {
+							content: element.find(".editor textarea").val(),
+							shortID: id
+						}, function(data) {
+							bar.find("button").removeAttr("disabled");
+							if (data.status == "failed") {
+								message(data.message, "Failed to edit");
+							} else {
+								alert("woo");
+								// [TODO]: update view, refresh?
+							}
+						}, "json").fail(function() {
+							bar.find("button").removeAttr("disabled");
+						});
+						bar.find("button").attr("disabled", "disabled");
+					}
+				}).find("i").removeClass().addClass("icon-check").after(" Save");
+				element.find(".controls").hide();
+				element.find(".editor textarea").on(valuechange, function() {
+					adjustHeight($(this));
+				}).change().focus();
+				canclose = false;
+				return false;
+			});
+			element.find(".delete").click(function() {
+				element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual"));
+				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+				bar.find("div").text("deletion cannot be undone");
+				bar.find("button").remove();
+				bar.append(button.clone().addClass("cancel").attr("title", "Keep story"));
+				bar.find("button.cancel").click(function() {
+					canclose = true;
+				}).text("Keep story");
+				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Delete"));
+				bar.find("button.confirm").click(function() {
+					if (!$(this).attr("disabled")) {
+						$.post("/delete", {
+							shortID: id
+						}, function(data) {
+							bar.find("button").removeAttr("disabled");
+							if (data.status == "failed") {
+								message(data.message, "Failed to delete");
+							} else {
+								alert("woo");
+								// [TODO]: update view, refresh?
+							}
+						}, "json").fail(function() {
+							bar.find("button").removeAttr("disabled");
+						});
+						bar.find("button").attr("disabled", "disabled");
+					}
+				}).find("i").removeClass().addClass("icon-delete");
+				element.find(".controls").hide();
 				return false;
 			});
 		});

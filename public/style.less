@@ -298,10 +298,10 @@ h2 {
 		position: relative;
 		.transition;
 		overflow: hidden;
-		&:target, &.highlighed {
+		&.highlighed {
 			background: white;
-			margin: 0.4em -0.4em;
-			padding: 0.4em;
+			margin: @pad -@pad 2*@pad -@pad;
+			padding: @pad;
 			border-radius: 3px;
 			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 			@media (max-width: 31em) {
@@ -327,10 +327,19 @@ h2 {
 				}
 			}
 		}
-		.content {
+		.content, .editor textarea {
 			.transition;
 			line-height: 1.5;
 			word-break: break-word;
+		}
+		.editor {
+			textarea {
+				padding: 0 0 @pad 0;
+				border: 0;
+				box-shadow: none;
+				background: none;
+				color: inherit;
+			}
 		}
 		.more {
 			margin: @pad -@pad 0 -@pad;
@@ -343,6 +352,17 @@ h2 {
 				width: auto;
 				padding: @pad 2*@pad;
 				margin: @pad 0 0 0;
+			}
+			&.contextual {
+				padding: @pad;
+				margin-bottom: -@pad;
+				&, button {
+					color: white;
+					background: none;
+					border-color: white;
+				}
+				&.pos { background: #4380BA; }
+				&.neg { background: #AD343E; }
 			}
 		}
 	}
@@ -521,78 +541,6 @@ button.primary {
 }
 
 @import "/lib/font/cont.css";
-
-#radial {
-	font-size: 50px;
-	@bubblediameter: 1em;
-	@bubblepad: @bubblediameter*0.15;
-	width: 3*@bubblediameter+2*@bubblepad;
-	height: (3*@bubblediameter+3*@bubblepad)*sqrt(3)/2;
-	position: absolute;
-	border-radius: 999px;
-	background: rgba(255,255,255,0.4);
-	padding: @bubblepad;
-	margin: (3*@bubblediameter+2*@bubblepad)/-2;
-	z-index: 3;
-	.transition;
-	transition-property: background opacity;
-	display: none;
-	&.larger {
-		font-size: 80px;
-	}
-	> a, > div {
-		display: block;
-		width: @bubblediameter;
-		height: @bubblediameter;
-		background: red;
-		border-radius: 99px;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin: @bubblediameter/-2;
-		color: inherit;
-		text-align: center;
-		i {
-			font-size: @bubblediameter/2;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			display: block;
-		}
-	}
-	a {
-		.transition;
-		transition-duration: 0.1s;
-		border: none;
-		color: white;
-	}
-	.close { background: rgba(0,0,0,0.1) }
-	.star { background: #F2C14E }
-	.rewind { background: #4D9078 }
-	.author { background: #B4436C }
-	.edit { background: #F78154 }
-	.flag { background: #AD343E }
-	.info { background: #4380BA }
-	.generate-bubbles(6);
-	&.collapsed {
-		background: transparent;
-		transition-duration: 0.5s;
-		opacity: 0;
-		a {
-			transform: scale(0.6);
-			opacity: 0;
-		}
-	}
-}
-
-.generate-bubbles(@n, @i: 1) when (@i =< @n) {
-	.bubble@{i} {
-		transform: translate(cos((-3+@i)*360deg/@n)*(@bubblediameter+@bubblepad), sin((-3+@i)*360deg/@n)*(@bubblediameter+@bubblepad));
-		transition-delay: @i*0.04s;
-	}
-	.generate-bubbles(@n, (@i+1));
-}
 
 footer {
 	text-align: center;
