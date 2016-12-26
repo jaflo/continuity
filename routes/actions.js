@@ -28,6 +28,7 @@ module.exports = function(app) {
 							display: user.displayname,
 							emoji: user.emoji
 						};
+						story["mine"] = req.user && req.user.shortID == user.shortID;
 						story["starred"] = req.user && req.user.starred.includes(story.shortID);
 						tools.completeRequest(req, res, story, '/story/' + story.shortID, "Successfully retrieved story");
 					});
@@ -261,6 +262,7 @@ function attemptCreation(req, res, shortID) {
 						display: req.user.displayname,
 						emoji: req.user.emoji
 					};
+		            newObject["mine"] = true;
 
 					User.findOneAndUpdate(
 						{'shortID': req.user.shortID},
