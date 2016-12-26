@@ -286,6 +286,41 @@ $(document).ready(function() {
 				element.find(".controls").hide();
 				return false;
 			});
+			element.find(".flag").click(function() {
+				element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual raiseflag"));
+				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+				bar.find("div").remove();
+				bar.find("button").remove();
+				bar.append($("<input>").attr("placeholder", "why should this be deleted?"));
+				bar.append(button.clone().addClass("cancel").attr("title", "Nevermind"));
+				bar.find("button.cancel").click(function() {
+					canclose = true;
+				}).text("Nevermind");
+				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Flag"));
+				bar.find("button.confirm").click(function() {
+					if (!$(this).attr("disabled")) {
+						$.post("/flag", {
+							reason: bar.find("input").val(),
+							shortID: id
+						}, function(data) {
+							bar.find("button").removeAttr("disabled");
+							if (data.status == "failed") {
+								message(data.message, "Failed to flag");
+							} else {
+								alert("woo");
+								// [TODO]: update view, refresh?
+							}
+						}, "json").fail(function() {
+							bar.find("button").removeAttr("disabled");
+						});
+						bar.find("button").attr("disabled", "disabled");
+					}
+				}).find("i").removeClass().addClass("icon-flag");
+				element.find(".controls").hide();
+				element.find(".raiseflag input").focus();
+				canclose = false;
+				return false;
+			});
 		});
 	}
 
