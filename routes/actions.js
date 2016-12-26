@@ -169,12 +169,12 @@ module.exports = function(app) {
 		if(!req.user) tools.failRequest(req, res, "Log in to delete a story");
 		else if(!req.body.shortID) tools.failRequest(req, res, "Provide a story to delete");
 		else {
-			Story.find({shortID: req.body.shortID}).exec()
+			Story.findOne({shortID: req.body.shortID}).exec()
 			.then(function(story) {
 				if(story == null) {
 					tools.failRequest(req, res, "This story does not exist");
 					return -1;
-				} else if(story.auther != req.user.shortID) {
+				} else if(story.author != req.user.shortID) {
 					tools.failRequest(req, res, "You do not have permission to delete this story");
 					return -1;
 				} else {
@@ -206,12 +206,15 @@ module.exports = function(app) {
 		else if(!req.body.shortID) tools.failRequest(req, res, "Provide a story to delete");
 		else if(errors) tools.failRequest(req, res, errors);
 		else {
-			Story.find({shortID: req.body.shortID}).exec()
+			Story.findOne({shortID: req.body.shortID}).exec()
 			.then(function(story) {
 				if(story == null) {
 					tools.failRequest(req, res, "This story does not exist");
 					return -1;
-				} else if(story.auther != req.user.shortID) {
+				} else if(story.author != req.user.shortID) {
+					console.log(story.author);
+					console.log(story);
+					console.log(req.user.shortID);
 					tools.failRequest(req, res, "You do not have permission to edit this story");
 					return -1;
 				} else {
@@ -226,9 +229,9 @@ module.exports = function(app) {
 				else if(count != 0) {
 					tools.failRequest(req, res, "You cannot edit a story with children");
 				} else {
-					return Story.findOneAndUpdate({shortID: req.body.shortID}, {$set: {'content': req.body.contents}}).exec()
+					return Story.findOneAndUpdate({shortID: req.body.shortID}, {$set: {'content': req.body.content}}).exec()
 					.then(function(status) {
-						tools.completeRequest(req, res, null, "/story/"+status.shortID, "Successfully editted story");
+						tools.completeRequest(req, res, {content: req.body.content}, "/story/"+status.shortID, "Successfully editted story");
 					});
 				}
 			});
