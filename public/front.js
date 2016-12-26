@@ -43,10 +43,9 @@ $(document).ready(function() {
 	});
 
 	function adjustHeight(thing) {
-		$("main").append($("<div id=tester class=inputlike>").text(thing.val()));
-		var determinedheight = $("#tester").innerHeight() + 30;
-		thing.height(determinedheight > origboxheight ? determinedheight : "");
-		$("#tester").remove();
+		thing.height("");
+		var determinedheight = thing[0].scrollHeight;
+		thing.height(determinedheight > 160 ? determinedheight : "");
 	}
 
 	writestoryarea.on(valuechange, function(e) {
@@ -119,8 +118,9 @@ $(document).ready(function() {
 						message(data.message, "Failed to create");
 					} else {
 						writestoryarea.val("");
-						if (localstore) localStorage.removeItem("save_"+currentID);
+						var id = currentID;
 						renderPiece(data.data);
+						localStorage.removeItem("save_"+id);
 					}
 				}, "json").fail(function() {
 					actionform.find("textarea, button").removeAttr("disabled");
@@ -301,6 +301,7 @@ $(document).ready(function() {
 		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
 		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
+		if (!piece.mine) snippet.find(".edit, .delete").remove();
 		var storyHeight = storyarea.outerHeight();
 		attachEventHandlers(snippet);
 		storyarea.append(snippet);

@@ -43,8 +43,8 @@
 			{{else}}
 			<button type="button" class="star" title="Star"><i class="icon-star"></i> <span>{{starcount}}</span></button>
 			{{/if}}
-			<button type="button" class="edit" title="Edit"><i class="icon-edit"></i></button>
-			<button type="button" class="delete" title="Delete"><i class="icon-delete"></i></button>
+			{{#if mine}}<button type="button" class="edit" title="Edit"><i class="icon-edit"></i></button>
+			<button type="button" class="delete" title="Delete"><i class="icon-delete"></i></button>{{/if}}
 			<button type="button" class="flag" title="Report"><i class="icon-flag"></i></button>
 		</div>
 	</div>
