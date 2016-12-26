@@ -5,7 +5,7 @@ $(document).ready(function() {
 		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
 		origboxheight = writestoryarea.innerHeight(), prevText = "",
-		valuechange = "change keyup keydown keypress", canclose = true,
+		valuechange = "keyup keydown keypress", canclose = true,
 		transitionend = "webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend",
 		localstore = $("#user").hasClass("loggedout") && typeof(Storage) !== "undefined";
 
@@ -106,7 +106,7 @@ $(document).ready(function() {
 		prevText = nowText;
 	});
 	$("#next .status").text("restoring...");
-	writestoryarea.val(writestoryarea.val() || localStorage.getItem("save_"+currentID)).change();
+	writestoryarea.val(writestoryarea.val() || localStorage.getItem("save_"+currentID)).keypress();
 	$("#next .status").text("ready");
 
 	actionform.submit(function(e) {
@@ -117,7 +117,7 @@ $(document).ready(function() {
 					if (data.status == "failed") {
 						message(data.message, "Failed to create");
 					} else {
-						writestoryarea.val("");
+						writestoryarea.val("").keypress();
 						var id = currentID;
 						renderPiece(data.data);
 						localStorage.removeItem("save_"+id);
@@ -194,17 +194,17 @@ $(document).ready(function() {
 				}
 			});
 			element.find("time").timeago();
-			element.find(".rewind").click(function() {
+			element.find(".rewind").click(function(e) {
 				if (historyManipulated) window.location.replace("/story/"+id);
 				else window.location = "/story/"+id;
+				blowBubble(e, false, "#4D9078", element);
 				return false;
 			});
-			element.find(".star").click(function() {
+			element.find(".star").click(function(e) {
 				var myself = $(this);
 				$.post(element.hasClass("starred") ? "/unstar" : "/star", {
 					id: id
 				}, function(data) {
-					console.log(data);
 					if (data.status == "failed") {
 						message(data.message, "Failed to star");
 					} else {
@@ -214,114 +214,160 @@ $(document).ready(function() {
 						myself.attr("title", data.data.starred ? "Unstar" : "Star");
 					}
 				}, "json");
+				blowBubble(e, false, "#F2C14E", element);
 				return false;
 			});
-			element.find(".edit").click(function() {
-				var editable = $("<div class=editor><textarea>");
-				editable.find("textarea").val(element.find(".content").text());
-				element.find(".content").hide().after(editable);
-				editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
-				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
-				bar.find("div").text("after saving, your edit cannot be undone");
-				bar.find("button").remove();
-				bar.append(button.clone().addClass("cancel").attr("title", "Discard changes"));
-				bar.find("button.cancel").click(function() {
-					canclose = true;
-				}).find("i").removeClass().addClass("icon-close");
-				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Save changes"));
-				bar.find("button.confirm").click(function() {
-					if (!$(this).attr("disabled")) {
-						$.post("/edit", {
-							content: element.find(".editor textarea").val(),
-							shortID: id
-						}, function(data) {
-							bar.find("button").removeAttr("disabled");
-							if (data.status == "failed") {
-								message(data.message, "Failed to edit");
-							} else {
-								alert("woo");
-								// [TODO]: update view, refresh?
-							}
-						}, "json").fail(function() {
-							bar.find("button").removeAttr("disabled");
-						});
-						bar.find("button").attr("disabled", "disabled");
-					}
-				}).find("i").removeClass().addClass("icon-check").after(" Save");
-				element.find(".controls").hide();
-				element.find(".editor textarea").on(valuechange, function() {
-					adjustHeight($(this));
-				}).change().focus();
-				canclose = false;
+			element.find(".edit").click(function(e) {
+				blowBubble(e, function() {
+					var editable = $("<div class=editor><textarea>");
+					editable.find("textarea").val(element.find(".content").text());
+					element.find(".content").hide().after(editable);
+					editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
+					var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+					bar.find("div").text("after saving, your edit cannot be undone");
+					bar.find("button").remove();
+					bar.append(button.clone().addClass("cancel").attr("title", "Discard changes"));
+					bar.find("button.cancel").click(function() {
+						canclose = true;
+					}).click(blowBubble).find("i").removeClass().addClass("icon-close");
+					bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Save changes"));
+					bar.find("button.confirm").click(function() {
+						if (!$(this).attr("disabled")) {
+							$.post("/edit", {
+								content: element.find(".editor textarea").val(),
+								shortID: id
+							}, function(data) {
+								bar.find("button").removeAttr("disabled");
+								if (data.status == "failed") {
+									message(data.message, "Failed to edit");
+								} else {
+									element.find(".content").text(data.data.content);
+									canclose = true;
+									element.click();
+								}
+							}, "json").fail(function() {
+								bar.find("button").removeAttr("disabled");
+							});
+							bar.find("button").attr("disabled", "disabled");
+						}
+					}).click(blowBubble).find("i").removeClass().addClass("icon-check").after(" Save");
+					element.find(".controls").hide();
+					element.find(".editor textarea").on(valuechange, function() {
+						adjustHeight($(this));
+					}).keypress().focus();
+					canclose = false;
+					bar.outerWidth();
+					bar.addClass("shown");
+				}, "#4380BA", element);
 				return false;
 			});
-			element.find(".delete").click(function() {
-				element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual"));
-				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
-				bar.find("div").text("deletion cannot be undone");
-				bar.find("button").remove();
-				bar.append(button.clone().addClass("cancel").attr("title", "Keep story"));
-				bar.find("button.cancel").click(function() {
-					canclose = true;
-				}).text("Keep story");
-				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Delete"));
-				bar.find("button.confirm").click(function() {
-					if (!$(this).attr("disabled")) {
-						$.post("/delete", {
-							shortID: id
-						}, function(data) {
-							bar.find("button").removeAttr("disabled");
-							if (data.status == "failed") {
-								message(data.message, "Failed to delete");
-							} else {
-								alert("woo");
-								// [TODO]: update view, refresh?
-							}
-						}, "json").fail(function() {
-							bar.find("button").removeAttr("disabled");
-						});
-						bar.find("button").attr("disabled", "disabled");
-					}
-				}).find("i").removeClass().addClass("icon-delete");
-				element.find(".controls").hide();
+			element.find(".delete").click(function(e) {
+				blowBubble(e, function() {
+					element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual"));
+					var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+					bar.find("div").text("deletion cannot be undone");
+					bar.find("button").remove();
+					bar.append(button.clone().addClass("cancel").attr("title", "Keep story"));
+					bar.find("button.cancel").click(function() {
+						canclose = true;
+					}).click(blowBubble).text("Keep story");
+					bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Delete"));
+					bar.find("button.confirm").click(function() {
+						if (!$(this).attr("disabled")) {
+							$.post("/delete", {
+								shortID: id
+							}, function(data) {
+								bar.find("button").removeAttr("disabled");
+								if (data.status == "failed") {
+									message(data.message, "Failed to delete");
+								} else {
+									console.log(data);
+									alert("woo");
+									// [TODO]: update view, refresh?
+								}
+							}, "json").fail(function() {
+								bar.find("button").removeAttr("disabled");
+							});
+							bar.find("button").attr("disabled", "disabled");
+						}
+					}).click(blowBubble).find("i").removeClass().addClass("icon-delete");
+					element.find(".controls").hide();
+					bar.outerWidth();
+					bar.addClass("shown");
+				}, "#AD343E");
 				return false;
 			});
-			element.find(".flag").click(function() {
-				element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual raiseflag"));
-				var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
-				bar.find("div").remove();
-				bar.find("button").remove();
-				bar.append($("<input>").attr("placeholder", "why should this be deleted?"));
-				bar.append(button.clone().addClass("cancel").attr("title", "Nevermind"));
-				bar.find("button.cancel").click(function() {
-					canclose = true;
-				}).text("Nevermind");
-				bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Flag"));
-				bar.find("button.confirm").click(function() {
-					if (!$(this).attr("disabled")) {
-						$.post("/flag", {
-							reason: bar.find("input").val(),
-							shortID: id
-						}, function(data) {
-							bar.find("button").removeAttr("disabled");
-							if (data.status == "failed") {
-								message(data.message, "Failed to flag");
-							} else {
-								alert("woo");
-								// [TODO]: update view, refresh?
-							}
-						}, "json").fail(function() {
-							bar.find("button").removeAttr("disabled");
-						});
-						bar.find("button").attr("disabled", "disabled");
-					}
-				}).find("i").removeClass().addClass("icon-flag");
-				element.find(".controls").hide();
-				element.find(".raiseflag input").focus();
-				canclose = false;
+			element.find(".flag").click(function(e) {
+				blowBubble(e, function() {
+					element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual raiseflag"));
+					var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+					bar.find("div").remove();
+					bar.find("button").remove();
+					bar.append($("<input>").attr("placeholder", "why should this be deleted?"));
+					bar.append(button.clone().addClass("cancel").attr("title", "Nevermind"));
+					bar.find("button.cancel").click(function() {
+						canclose = true;
+					}).click(blowBubble).text("Nevermind");
+					bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Flag"));
+					bar.find("button.confirm").click(function() {
+						if (!$(this).attr("disabled")) {
+							$.post("/flag", {
+								reason: bar.find("input").val(),
+								shortID: id
+							}, function(data) {
+								bar.find("button").removeAttr("disabled");
+								if (data.status == "failed") {
+									message(data.message, "Failed to flag");
+								} else {
+									alert("woo");
+									// [TODO]: update view, refresh?
+								}
+							}, "json").fail(function() {
+								bar.find("button").removeAttr("disabled");
+							});
+							bar.find("button").attr("disabled", "disabled");
+						}
+					}).click(blowBubble).find("i").removeClass().addClass("icon-flag");
+					element.find(".controls").hide();
+					element.find(".raiseflag input").focus();
+					canclose = false;
+					bar.outerWidth();
+					bar.addClass("shown");
+				}, "#AD343E");
 				return false;
 			});
 		});
+	}
+
+	function blowBubble(e, callback, color, fill) {
+		var around = $(e.target),
+			bubble = $("<div>").addClass("hidden click").toggleClass("fadeout", color != "#AD343E" && color != "#4380BA"),
+			container = (fill ? fill : around.parents(".more")).toggleClass("noverflow", color),
+			x = around.offset().left-container.offset().left+e.offsetX,
+			y = around.offset().top-container.offset().top+e.offsetY,
+			diameter = Math.sqrt(Math.pow(container.outerWidth(), 2) + Math.pow(container.outerHeight(), 2))*2;
+		if (color != "#AD343E" && color != "#4380BA") diameter = 500;
+		bubble.css({
+			background: color ? color : "rgba(0,0,0,0.7)",
+			width: diameter,
+			height: diameter,
+			margin: -diameter/2,
+			top: y,
+			left: x
+		});
+		container.append(bubble).outerWidth();
+		bubble.on(transitionend, function() {
+			if (typeof callback == "function") callback();
+			if (color != "#4380BA") {
+				bubble.remove();
+				container.removeClass("noverflow");
+			} else {
+				bubble.unbind(transitionend).addClass("fadeout").on(transitionend, function() {
+					bubble.remove();
+					container.removeClass("noverflow");
+				});
+			}
+		}).removeClass("hidden");
 	}
 
 	attachEventHandlers("#story .piece");
@@ -353,8 +399,8 @@ $(document).ready(function() {
 			$("#story").height("auto");
 		});
 		$("#next .status").text("restoring...");
-		if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").change();
-		if (piece.storyfragment) writestoryarea.val(piece.storyfragment || "").change();
+		if (localstore) writestoryarea.val(localStorage.getItem("save_"+currentID) || "").keypress();
+		if (piece.storyfragment) writestoryarea.val(piece.storyfragment || "").keypress();
 		$("#next .status").text("ready");
 		return false;
 	}

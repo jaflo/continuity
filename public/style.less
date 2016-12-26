@@ -333,27 +333,41 @@ h2 {
 			color: inherit;
 		}
 		.more {
-			margin: @pad -@pad 0 -@pad;
-			padding: @pad @pad 0 @pad;
+			margin: @pad -@pad -@pad -@pad;
+			padding: @pad;
 			border-top: 1px solid rgba(0,0,0,0.2);
 			color: rgba(0,0,0,0.6);
 			display: none;
+			position: relative;
 			button {
 				display: inline-block;
 				width: auto;
 				padding: @pad 2*@pad;
 				margin: @pad 0 0 0;
 			}
+			&.noverflow {
+				overflow: hidden;
+			}
 			&.contextual {
-				padding: @pad;
-				margin-bottom: -@pad;
-				&, button {
+				overflow: hidden;
+				color: transparent;
+				.transition;
+				z-index: 2;
+				input, button {
 					color: white;
 					background: none;
 					border-color: white;
+					opacity: 0;
+					.transition;
 				}
 				&.pos { background: #4380BA; }
 				&.neg { background: #AD343E; }
+				&.shown {
+					&, input, button {
+						color: white;
+						opacity: 1;
+					}
+				}
 			}
 		}
 		.raiseflag input {
@@ -363,6 +377,18 @@ h2 {
 			&:-moz-placeholder { color: @placeholdercolor; }
 			&::-moz-placeholder { color: @placeholdercolor; }
 			&:-ms-input-placeholder { color: @placeholdercolor; }
+		}
+		.click {
+			position: absolute;
+			border-radius: 999px;
+			.transition;
+			&.fadeout {
+				opacity: 0;
+			}
+			&.hidden {
+				transform: scale(0);
+				opacity: 1;
+			}
 		}
 	}
 	.master.piece {
