@@ -198,7 +198,7 @@ module.exports = function(app) {
 	});
 
 	app.post('/edit', function(req, res) {
-		req.assert('content', 'Please keep your story between 200 and 2000 characters').betweenLengths(MIN_LENGTH, MAX_LENGTH);
+		req.assert('content', 'Please keep your story between '+MIN_LENGTH+' and '+MAX_LENGTH+' characters').isLength({min: MIN_LENGTH, max: MAX_LENGTH});
 		var errors = req.validationErrors();
 
 		if(!req.user) tools.failRequest(req, res, "Log in to delete a story");
