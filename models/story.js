@@ -39,6 +39,11 @@ var storySchema = mongoose.Schema({
 		type: Number,
 		required: true,
 		default: 0
+	},
+	flagstatus: {
+		type: Number,
+		required: true,
+		default: 0
 	}
 });
 

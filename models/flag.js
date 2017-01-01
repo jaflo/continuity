@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var flagSchema = mongoose.Schema({
-	storyShortID: String,
+	story: String,
 	flaggings: [{
 		reason: String,
 		flagger: String,
@@ -10,6 +10,7 @@ var flagSchema = mongoose.Schema({
 		}
 	}],
 	status: String,
+	reason: String,
 	processedat: Date
 });
 module.exports = mongoose.model('Flag', flagSchema);
