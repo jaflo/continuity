@@ -90,7 +90,7 @@ module.exports = function(app) {
 								reason: req.body.reason,
 								flagger: req.user.shortID,
 							}];
-							newFlag.status = "unresolved";
+							newFlag.status = 0;
 							newFlag.save(function(err) {
 								if(err) {
 									console.log(err);
@@ -150,18 +150,24 @@ module.exports = function(app) {
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
 		else {
-			var changes = {$set: {flagstatus: 0, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+			var flagchanges = {$set: {status: 0, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+			var storychanges = {$set: {flagstatus: 0, changedat: Date.now()}};
 			var continu = true;
 			if(req.body.status == "hide") {
-				changes["$set"].flagstatus = 1;
+				flagchanges["$set"].status = 1;
+				storychanges["$set"].flagstatus = 1;
 			}
 			else if(req.body.status == "remove") {
-				changes["$set"].flagstatus = 2;
+				flagchanges["$set"].status = 2;
+				storychanges["$set"].flagstatus = 2;
+				storychanges["$set"]["content"] = "[FLAGGED]";
 			}
 			else if(req.body.status == "dismiss") {
-				changes["$set"].flagstatus = 3;
+				flagchanges["$set"].status = 3;
+				storychanges["$set"].flagstatus = 3;
 			}
 			else continu = false;
+			console.log(flagchanges);
 			if(continu) {
 				Story.count({ shortID: req.body.shortID }).exec()
 				.then(function(count) {
@@ -173,17 +179,15 @@ module.exports = function(app) {
 				})
 				.then(function(status) {
 					if(status) {
-						if(req.body.status == "remove") {
-							return Story.findOneAndUpdate({ shortID: req.body.shortID }, {content: "[FLAGGED]"}).exec()
-							.then(function(status) {
-								return 1;
-							});
-						} else return 1;
+						return Story.findOneAndUpdate({ shortID: req.body.shortID }, storychanges).exec()
+						.then(function(status) {
+							return 1;
+						});
 					} else return null;
 				})
 				.then(function(status) {
 					if(status) {
-						return Flag.findOneAndUpdate({ shortID: req.body.shortID }, changes).exec()
+						return Flag.findOneAndUpdate({ story: req.body.shortID }, flagchanges).exec()
 						.then(function(status) { return 1; } );
 					} else return null;
 				})

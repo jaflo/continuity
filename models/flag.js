@@ -9,7 +9,7 @@ var flagSchema = mongoose.Schema({
 			default: Date.now()
 		}
 	}],
-	status: String,
+	status: Number,
 	reason: String,
 	processedat: Date,
 	reviewer: String
