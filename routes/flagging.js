@@ -57,9 +57,7 @@ module.exports = function(app) {
 					var user = arr[2];
 					flag.story = story;
 					flag.story.author = user;
-					res.render('individualflag', {
-						flag: flag
-					});
+					res.render('individualflag', flag);
 				}
 			})
 			.catch(function(err) {
@@ -114,8 +112,8 @@ module.exports = function(app) {
 						if(flag.flaggings[i].flagger == req.user.shortID) exists = true;
 					}
 					if(exists) tools.failRequest(req, res, "You've already flagged this story"); // users cannot flag a story more than once
-					else if(flag.status == 3) tools.failRequest(req, res, "This story has already been removed.");
-					else if(flag.status == 4) tools.failRequest(req, res, "This story has already been reviewed to be good.");
+					else if(flag.status == 2) tools.failRequest(req, res, "This story has already been removed.");
+					else if(flag.status == 3) tools.failRequest(req, res, "This story has already been reviewed to be good.");
 					else {
 						Flag.findOneAndUpdate(
 							{story: req.body.shortID},
@@ -149,23 +147,12 @@ module.exports = function(app) {
 		var errors = req.validationErrors();
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
-		else if(status == "dismiss") {
-			Story.find({ shortID: req.body.shortID }).remove().exec()
-			.then(function(status) {
-					return Flag.find({ shortID: req.body.shortID }).remove().exec().then(function(status) { return status; } );
-			})
-			.then(function(status) {
-				tools.completeRequest(req, res, null, "back", "Successfully dismissed flag");
-			})
-			.catch(function(status) {
-				console.log(status);
-				tools.failRequest(req, res, "Internal Error: Unable to dismiss flag.");
-			});
-		} else {
+		else {
 			var query;
 			var continu = true;
-			if(status == "hide") query = {$set: {flagstatus: 1}};
-			else if(status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]"}};
+			if(status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now()}};
+			else if(status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now()}};
+			else if(status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now()}};
 			else continu = false;
 			if(continu) {
 				Story.count({ shortID: req.body.shortID }).exec()
