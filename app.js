@@ -1,6 +1,8 @@
 // Before starting, run the following command:
 // mongod --setParameter failIndexKeyTooLong=false
 
+console.log("Starting...");
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -22,6 +24,7 @@ mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
 var User = require('./models/user.js');
 var Story = require('./models/story.js');
+var Flag = require('./models/flag.js');
 
 var app = express();
 
@@ -86,6 +89,7 @@ app.use(function(req, res, next) {
 
 User.collection.drop(); //For testion purposes, deletes all previous users on startup
 Story.collection.drop(); //For testion purposes, deletes all previous stories on startup
+Flag.collection.drop(); //For testion purposes, deletes all previous flags on startup
 //If the database is new and their are no stories, create the first one
 Story.collection.count({}, function(err, count) {
 	if (count == 0) {
@@ -101,7 +105,7 @@ Story.collection.count({}, function(err, count) {
 			if (err) return console.error(err);
 			//console.dir(parentStory);
 		});
-		console.log("Save successful");
+		console.log("Initialized!");
 		process.emit("initialized");
 	}
 });

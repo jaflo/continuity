@@ -344,6 +344,10 @@ h2 {
 				width: auto;
 				padding: @pad 2*@pad;
 				margin: @pad 0 0 0;
+				&.star span {
+					display: inline-block;
+					min-width: 1em;
+				}
 			}
 			&.noverflow {
 				overflow: hidden;
@@ -351,19 +355,16 @@ h2 {
 			&.contextual {
 				overflow: hidden;
 				color: transparent;
-				.transition;
-				z-index: 2;
-				input, button {
+				button {
 					color: white;
 					background: none;
 					border-color: white;
 					opacity: 0;
-					.transition;
 				}
 				&.pos { background: #4380BA; }
 				&.neg { background: #AD343E; }
 				&.shown {
-					&, input, button {
+					&, button {
 						color: white;
 						opacity: 1;
 					}
@@ -562,6 +563,28 @@ button.primary {
 }
 
 @import "/lib/font/cont.css";
+
+.toast {
+	background: #323232;
+	color: white;
+	padding: @pad*2;
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	.transition;
+	width: 100%;
+	box-sizing: border-box;
+	max-width: 25em;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	@media (min-width: 25em) {
+		border-radius: 3px 3px 0 0;
+	}
+	&.hidden {
+		transform: translateX(-50%) translateY(100%);
+		color: transparent;
+	}
+}
 
 footer {
 	text-align: center;

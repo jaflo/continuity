@@ -1,0 +1,8 @@
+{{status}}, {{{timestamp processedat}}}, reported {{pluralize flaggings.length "time" true}}:
+<ul>
+	{{#each flaggings}}<li>{{flagger}} {{{timestamp createdat}}}: {{reason}}</li>{{/each}}
+</ul>
+<a href="/story/{{story.shortID}}">Story</a> by
+{{user.emoji}} <a href="/user/{{story.author}}">{{user.displayname}}</a>
+{{{timestamp story.createdat}}}:
+{{story.content}}
