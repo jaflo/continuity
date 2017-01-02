@@ -345,6 +345,32 @@ h2 {
 		&.hidden {
 			opacity: 0;
 		}
+		&.sensitive div {
+			visibility: hidden;
+		}
+		&.removed {
+			height: 60px;
+		}
+		&.sensitive, &.removed {
+			background: repeating-linear-gradient(45deg,
+				rgba(0,0,0,0.06), rgba(0,0,0,0.06) 10px,
+				transparent 10px, transparent 20px);
+		}
+		.banner {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			right: 0;
+			transform: translateY(-50%);
+			padding: @pad @pad*2;
+			text-align: center;
+			visibility: visible !important;
+			opacity: 0.7;
+			cursor: default;
+			a {
+				color: inherit;
+			}
+		}
 		.options {
 			opacity: 0.8;
 			i {

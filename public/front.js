@@ -158,8 +158,12 @@ $(document).ready(function() {
 		$(elements).not(".master").each(function() {
 			var element = $(this),
 				id = element.attr("id").replace("piece", "");
+			if (element.hasClass("sensitive")) element.find(".banner a").click(function() {
+				element.removeClass("sensitive").find(".banner").remove();
+				return false;
+			});
 			element.click(function() {
-				if (!canclose) return;
+				if (!canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
 				var previous = $("#story .highlighed.piece");
 				if (!element.hasClass("highlighed")) {
 					element.height("auto");
@@ -381,14 +385,21 @@ $(document).ready(function() {
 	function renderPiece(piece) {
 		var snippet = $(".master.piece").clone();
 		snippet.removeClass("master").addClass("hidden").attr("id", "piece"+piece.shortID);
+		snippet.toggleClass("starred", piece.starred);
 		snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
 		snippet.find(".author").find("span").text("by "+piece.author.display);
-		snippet.toggleClass("starred", piece.starred);
 		snippet.find(".star").attr("title", piece.starred ? "Unstar" : "Star").find("span").text(piece.starcount);
 		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
 		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
 		if (!piece.mine) snippet.find(".edit, .delete").remove();
+		if (piece.flagstatus == 1) {
+			snippet.append("<div class=banner>This contains sensitive content. <a href=#>Show anyways</a></div>");
+			snippet.addClass("sensitive");
+		} else if (piece.flagstatus == 2) {
+			snippet.html("<div class=banner>This has been removed.</div>");
+			snippet.addClass("removed");
+		}
 		var storyHeight = storyarea.outerHeight();
 		attachEventHandlers(snippet);
 		storyarea.append(snippet);

@@ -28,7 +28,7 @@
 	<div class="piece{{#if starred}} starred{{/if}}{{#if removed}} removed{{/if}}{{#if hidden}} sensitive{{/if}}" id="piece{{shortID}}">
 		{{#if removed}}
 		<div class="banner">
-			this has been removed
+			This has been removed.
 		</div>
 		{{else}}
 		<div class="options">
@@ -37,10 +37,6 @@
 				<span>by {{author.display}}</span>
 			</a>
 		</div>
-		{{#if hidden}}<div class="banner">
-			this is sensitive content
-			<button>Show anyways</button>
-		</div>{{/if}}
 		<div class="content">{{content}}</div>
 		<div class="more controls">
 			<div>
@@ -56,6 +52,10 @@
 			<button type="button" class="delete" title="Delete"><i class="icon-delete"></i></button>{{/if}}
 			<button type="button" class="flag" title="Report"><i class="icon-flag"></i></button>
 		</div>
+		{{#if hidden}}<div class="banner">
+			This contains sensitive content.
+			<a href="#">Show anyways</a>
+		</div>{{/if}}
 		{{/if}}
 	</div>
 	{{/each}}
