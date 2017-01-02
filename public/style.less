@@ -280,6 +280,20 @@ h2 {
 		text-align: left;
 		position: relative;
 		z-index: 2;
+		&.checkbox {
+			margin-bottom: @pad;
+			padding-left: @pad*2+1;
+			input {
+				display: inline-block;
+				width: 1em;
+				height: 1em;
+				margin: 0;
+				position: absolute;
+				top: 50%;
+				margin-top: -0.5em;
+				left: @pad;
+			}
+		}
 	}
 	input {
 		padding-top: 2em;

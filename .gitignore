@@ -31,3 +31,6 @@ npm-debug.log
 
 # Converted LESS file
 public/style.css
+
+# Cache folder
+cache/*

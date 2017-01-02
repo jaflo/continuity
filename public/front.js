@@ -175,7 +175,7 @@ $(document).ready(function() {
 				}
 				if (previous.length > 0) {
 					previous.height("auto");
-					var visible = previous.find("> div:visible"), hidden = previous.find("> div:hidden");
+					var visible = previous.find("> div:visible, > form:visible"), hidden = previous.find("> div:hidden");
 					var before = previous.outerHeight() - 2*parseFloat(previous.css("padding-top"));
 					previous.removeClass("highlighed").find(".more, .editor").hide();
 					previous.find(".content").show();
@@ -219,11 +219,11 @@ $(document).ready(function() {
 			});
 			element.find(".edit").click(function(e) {
 				blowBubble(e, function() {
-					var editable = $("<div class=editor><textarea>");
+					var editable = $("<form class=editor><textarea>");
 					editable.find("textarea").val(element.find(".content").text());
 					element.find(".content").hide().after(editable);
 					editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
-					var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
+					var bar = element.find(".contextual").show(), button = $("<button type=button><i>");
 					bar.find("div").text("after saving, your edit cannot be undone");
 					bar.find("button").remove();
 					bar.append(button.clone().addClass("cancel").attr("title", "Discard changes"));
@@ -231,7 +231,7 @@ $(document).ready(function() {
 						canclose = true;
 					}).click(blowBubble).find("i").removeClass().addClass("icon-close");
 					bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Save changes"));
-					bar.find("button.confirm").click(function() {
+					editable.submit(function(e) {
 						if (!$(this).attr("disabled")) {
 							$.post("/edit", {
 								content: element.find(".editor textarea").val(),
@@ -251,7 +251,9 @@ $(document).ready(function() {
 							});
 							bar.find("button").attr("disabled", "disabled");
 						}
-					}).click(blowBubble).find("i").removeClass().addClass("icon-check").after(" Save");
+						e.preventDefault();
+					});
+					bar.find("button.confirm").click(blowBubble).find("i").removeClass().addClass("icon-check").after(" Save");
 					element.find(".controls").hide();
 					element.find(".editor textarea").on(valuechange, function() {
 						adjustHeight($(this));
@@ -302,17 +304,15 @@ $(document).ready(function() {
 			});
 			element.find(".flag").click(function(e) {
 				blowBubble(e, function() {
-					element.find(".content").after($(".master .more").clone().removeClass("controls").addClass("neg contextual raiseflag"));
-					var bar = element.find(".contextual").show(), button = bar.find("button").first().clone().removeClass();
-					bar.find("div").remove();
-					bar.find("button").remove();
+					element.find(".content").after($("<form class='more neg contextual raiseflag'><form>"));
+					var bar = element.find(".contextual").show(), button = $("<button type=button><i>");
 					bar.append($("<input>").attr("placeholder", "why should this be deleted?"));
 					bar.append(button.clone().addClass("cancel").attr("title", "Nevermind"));
 					bar.find("button.cancel").click(function() {
 						canclose = true;
 					}).click(blowBubble).text("Nevermind");
 					bar.append(" ").append(button.clone().addClass("confirm").attr("title", "Flag"));
-					bar.find("button.confirm").click(function() {
+					bar.submit(function(e) {
 						if (!$(this).attr("disabled")) {
 							$.post("/flag", {
 								reason: bar.find("input").val(),
@@ -331,7 +331,9 @@ $(document).ready(function() {
 							});
 							bar.find("button").attr("disabled", "disabled");
 						}
-					}).click(blowBubble).find("i").removeClass().addClass("icon-flag");
+						e.preventDefault();
+					});
+					bar.find("button.confirm").attr("type", "submit").click(blowBubble).find("i").addClass("icon-flag");
 					element.find(".controls").hide();
 					element.find(".raiseflag input").focus();
 					canclose = false;
