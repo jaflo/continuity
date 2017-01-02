@@ -24,7 +24,8 @@ module.exports = function(passport, LocalStrategy) {
 			req.flash("email", email);
 			User.findOne({
 				'email': email
-			}).exec().then(function(err, user) {
+			}).exec()
+			.then(function(user) {
 				if (user) {
 					return done(null, false, req.flash('error', 'That email is already registered'));
 				} else {
