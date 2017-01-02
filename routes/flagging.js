@@ -149,24 +149,12 @@ module.exports = function(app) {
 		var errors = req.validationErrors();
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
-		else if(status == "dismiss") {
-			Story.find({ shortID: req.params.id }).remove().exec()
-			.then(function(status) {
-					return Flag.find({ shortID: req.params.id }).remove().exec().then(function(status) { return status; } );
-			})
-			.then(function(status) {
-				tools.completeRequest(req, res, null, "back", "Successfully dismissed flag");
-			})
-			.catch(function(status) {
-				console.log(status);
-				tools.failRequest(req, res, "Internal Error: Unable to dismiss flag.");
-			});
-		} else {
+		else {
 			var query;
 			var continu = true;
-			if(status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason}};
-			else if(status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason}};
-			else if(status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}};
+			if(req.body.status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason}};
+			else if(req.body.status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason}};
+			else if(req.body.status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}};
 			else continu = false;
 			if(continu) {
 				Story.count({ shortID: req.params.id }).exec()
