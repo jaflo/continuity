@@ -1,8 +1,36 @@
-{{status}}, {{{timestamp processedat}}}, reported {{pluralize flaggings.length "time" true}}:
-<ul>
-	{{#each flaggings}}<li>{{flagger}} {{{timestamp createdat}}}: {{reason}}</li>{{/each}}
-</ul>
-<a href="/story/{{story.shortID}}">Story</a> by
-{{user.emoji}} <a href="/user/{{story.author}}">{{user.displayname}}</a>
-{{{timestamp story.createdat}}}:
-{{story.content}}
+<div class="info">
+	<h3>Overview</h3>
+	{{status}}{{#if reason}}: {{reason}}{{/if}}<br />
+	{{#if reviewer}}handled by {{reviewer}}<br />{{/if}}
+	last reviewed {{{timestamp processedat}}}<br />
+	{{#if reviewer}}handled by {{reviewer}}<br />{{/if}}
+	reported {{pluralize flaggings.length "time" true}}
+</div>
+
+<div class="story">
+	<h3>Story</h3>
+	{{{timestamp story.createdat}}} {{user.emoji}} <a href="/user/{{story.author}}">{{user.displayname}}</a> wrote:
+	<div class="contents">{{story.content}}</div>
+</div>
+
+<div class="reports">
+	<h3>{{pluralize flaggings.length "report" true}}</h3>
+	<ul>
+		{{#each flaggings}}<li>{{reason}} ({{{timestamp createdat}}})</li>{{/each}}
+	</ul>
+</div>
+
+<form class="" action="/flag/{{story.shortID}}/process" method="post">
+	<h3>Further actions</h3>
+	<input type="hidden" name="shortID" value="{{story.shortID}}" />
+	<div class="inputlike select">
+		<select name="status">
+			<option value="" selected>what should happen?</option>
+			<option value="hide">sensitive or unwanted, hide</option>
+			<option value="remove">illegal, purge</option>
+			<option value="dismiss">perfectly fine, dismiss</option>
+		</select>
+	</div>
+	<textarea name="reason" class="short" placeholder="Document the issue"></textarea>
+	<button type="submit">Process</button>
+</form>

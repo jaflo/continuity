@@ -1,8 +1,7 @@
+<h2>Showing {{pluralize flags.length "flag" true}}</h2>
 {{#each flags}}
 <a href="/flag/{{story}}">
-	{{story}}, {{status}}, {{{timestamp processedat}}}, reported {{pluralize flaggings.length "time" true}}
-	<ul>
-		{{#each flaggings}}<li>{{flagger}} {{{timestamp createdat}}}: {{reason}}</li>{{/each}}
-	</ul>
+	{{story}}, {{status}}, {{{timestamp processedat}}},
+	reported {{pluralize flaggings.length "time" true}}
 </a>
 {{/each}}

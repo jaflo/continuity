@@ -504,7 +504,7 @@ $(document).ready(function() {
 		}
 	}
 
-	$(".inputlike").find("textarea, input, button").focus(function() {
+	$(".inputlike").find("textarea, input, button, select").focus(function() {
 		$(this).parents(".inputlike").addClass("focus");
 	}).blur(function() {
 		$(this).parents(".inputlike").removeClass("focus");
