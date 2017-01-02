@@ -143,16 +143,16 @@ module.exports = function(app) {
 	app.post('/processflag', function(req, res) {
 		req.assert('status', 'Flag status required').notEmpty();
 		req.assert('shortID', 'Story shortID required').notEmpty();
-		req.assert('shortID', 'Story shortID required').notEmpty();
+		req.assert('reason', 'Decision reason required').notEmpty();
 		var errors = req.validationErrors();
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
 		else {
 			var query;
 			var continu = true;
-			if(status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now()}};
-			else if(status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now()}};
-			else if(status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now()}};
+			if(status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason}};
+			else if(status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason}};
+			else if(status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}};
 			else continu = false;
 			if(continu) {
 				Story.count({ shortID: req.body.shortID }).exec()
