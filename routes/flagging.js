@@ -150,11 +150,17 @@ module.exports = function(app) {
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
 		else {
-			var query;
+			var changes;
 			var continu = true;
-			if(req.body.status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason}};
-			else if(req.body.status == "remove") query = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason}};
-			else if(req.body.status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}};
+			if(req.body.status == "hide") {
+				changes = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+			}
+			else if(req.body.status == "remove") {
+				changes = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+			}
+			else if(req.body.status == "dismiss") {
+				changes = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}, reviewer: req.user.shortID};
+			}
 			else continu = false;
 			if(continu) {
 				Story.count({ shortID: req.params.id }).exec()
@@ -167,7 +173,7 @@ module.exports = function(app) {
 				})
 				.then(function(status) {
 					if(status == 1) {
-						return Story.findOneAndUpdate({ shortID: req.params.id }, query).exec()
+						return Story.findOneAndUpdate({ shortID: req.params.id }, changes).exec()
 						.then(function(status) {
 								return Flag.findOneAndUpdate({
 									shortID: req.params.id

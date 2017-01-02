@@ -11,6 +11,7 @@ var flagSchema = mongoose.Schema({
 	}],
 	status: String,
 	reason: String,
-	processedat: Date
+	processedat: Date,
+	reviewer: String
 });
 module.exports = mongoose.model('Flag', flagSchema);
