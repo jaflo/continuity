@@ -192,7 +192,7 @@ module.exports = function(app) {
 					} else return null;
 				})
 				.then(function(status) {
-					if(status) tools.completeRequest(req, res, null, "/story/"+req.body.shortID, "Successfully processed flag");
+					if(status) tools.completeRequest(req, res, null, "/flag/"+req.body.shortID, "Successfully processed flag");
 				})
 				.catch(function(status) {
 					console.log(status);

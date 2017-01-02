@@ -130,7 +130,9 @@ function getParentStory(req, newStory, storyArray, callback, render) { // recurs
 				display: user.displayname,
 				emoji: user.emoji
 			};
-            newStory["mine"] = req.user && req.user.shortID == user.shortID;
+			newStory.removed = newStory.flagstatus == 2;
+			newStory.hidden = newStory.flagstatus == 1;
+            newStory.mine = req.user && req.user.shortID == user.shortID;
 			storyArray.unshift(newStory);
 			callback(req, newParentStory, storyArray, callback, render);
 		}).catch(function(err) {
