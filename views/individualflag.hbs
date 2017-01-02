@@ -1,7 +1,6 @@
 <div class="info">
 	<h3>Overview</h3>
 	{{status}}{{#if reason}}: {{reason}}{{/if}}<br />
-	{{#if reviewer}}handled by {{reviewer}}<br />{{/if}}
 	last reviewed {{{timestamp processedat}}}<br />
 	{{#if reviewer}}handled by {{reviewer}}<br />{{/if}}
 	reported {{pluralize flaggings.length "time" true}}
@@ -9,7 +8,8 @@
 
 <div class="story">
 	<h3>Story</h3>
-	{{{timestamp story.createdat}}} {{user.emoji}} <a href="/user/{{story.author}}">{{user.displayname}}</a> wrote:
+	<a href="/story/{{story.shortID}}">{{{timestamp story.createdat}}}</a>
+	{{user.emoji}} <a href="/user/{{story.author}}">{{user.displayname}}</a> wrote:
 	<div class="contents">{{story.content}}</div>
 </div>
 
