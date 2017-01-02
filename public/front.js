@@ -241,6 +241,7 @@ $(document).ready(function() {
 								if (data.status == "failed") {
 									message(data.message, "Failed to edit");
 								} else {
+									toast("Your story has been edited.");
 									element.find(".content").text(data.data.content);
 									canclose = true;
 									element.click();
@@ -281,9 +282,11 @@ $(document).ready(function() {
 								if (data.status == "failed") {
 									message(data.message, "Failed to delete");
 								} else {
-									console.log(data);
-									alert("woo");
-									// [TODO]: update view, refresh?
+									var parent = element.prev(".piece").attr("id").replace("piece", "");
+									element.nextAll(".piece").remove();
+									element.remove();
+									updateAddress(parent);
+									toast("Your story has been deleted.");
 								}
 							}, "json").fail(function() {
 								bar.find("button").removeAttr("disabled");
@@ -319,8 +322,9 @@ $(document).ready(function() {
 								if (data.status == "failed") {
 									message(data.message, "Failed to flag");
 								} else {
-									alert("woo");
-									// [TODO]: update view, refresh?
+									toast("The story has been flagged.");
+									canclose = true;
+									element.click();
 								}
 							}, "json").fail(function() {
 								bar.find("button").removeAttr("disabled");
@@ -343,8 +347,8 @@ $(document).ready(function() {
 		var around = $(e.target),
 			bubble = $("<div>").addClass("hidden click").toggleClass("fadeout", color != "#AD343E" && color != "#4380BA"),
 			container = (fill ? fill : around.parents(".more")).toggleClass("noverflow", color),
-			x = around.offset().left-container.offset().left+e.offsetX,
-			y = around.offset().top-container.offset().top+e.offsetY,
+			x = around.offset().left-container.offset().left+(e.offsetX||around.outerWidth()/2),
+			y = around.offset().top-container.offset().top+(e.offsetY||around.outerHeight()/2),
 			diameter = Math.sqrt(Math.pow(container.outerWidth(), 2) + Math.pow(container.outerHeight(), 2))*2;
 		if (color != "#AD343E" && color != "#4380BA") diameter = 500;
 		bubble.css({
@@ -408,11 +412,12 @@ $(document).ready(function() {
 	function updateAddress(id) {
 		currentID = id;
 		actionform.find("input[name=parent]").val(id);
+		var url = id == "00000" ? "/" : "/story/"+id;
 		if (historyManipulated) {
-			history.replaceState({}, id, "/story/"+id);
+			history.replaceState({}, id, url);
 		} else {
 			historyManipulated = true;
-			history.pushState({}, id, "/story/"+id);
+			history.pushState({}, id, url);
 		}
 	}
 
@@ -477,6 +482,24 @@ $(document).ready(function() {
 				}
 			});
 		});
+	}
+
+	var toasts = [];
+	function toast(message) {
+		if ($(".toast").length > 0) {
+			toasts.push(message);
+		} else {
+			var bar = $("<div>").addClass("hidden toast").text(message);
+			$("body").append(bar);
+			bar.outerWidth();
+			bar.removeClass("hidden");
+			setTimeout(function() {
+				bar.addClass("hidden").on(transitionend, function() {
+					bar.remove();
+					if (toasts.length > 0) toast(toasts.shift());
+				});
+			}, 3000);
+		}
 	}
 
 	$(".inputlike").find("textarea, input, button").focus(function() {

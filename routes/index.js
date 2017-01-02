@@ -3,7 +3,7 @@ var Story = require('../models/story.js');
 var tools = require('../config/tools.js');
 
 module.exports = function(app) {
-    app.get('/', function(req, res, next) {
+	app.get('/', function(req, res, next) {
 		var incompletestory;
 		if (req.user) {
 			var arrayofstories = req.user.incompletestories; // find incomplete text from previous session
@@ -166,15 +166,9 @@ function load(req, res, shortID, complete) { // finds lineage of story
 				});
 			});
 		} else {
-            res.status(404).render('index', {
-				notfound: true,
-				currentID: shortID
-			});
+            res.status(404).render('404');
 		}
 	}).catch(function(err) {
-        res.status(404).render('index', {
-            notfound: true,
-            currentID: shortID
-        });
+        res.status(404).render('404');
 	});
 }

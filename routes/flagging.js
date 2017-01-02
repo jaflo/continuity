@@ -5,6 +5,7 @@ var tools = require('../config/tools.js');
 
 module.exports = function(app) {
 	app.get('/flag', function(req, res) {
+		req.user.admin = true; // remove later!
 		if(!(req.user && req.user.admin)) res.status(404).render('404');
 		else {
 			Flag.find({}).exec()
@@ -21,42 +22,41 @@ module.exports = function(app) {
 	});
 
 	app.get('/flag/:id', function(req, res) {
+		req.user.admin = true; // remove later!
 		if(!(req.user && req.user.admin)) res.status(404).render('404');
 		else {
-			Flag.findOne({ story: req.body.shortID }).exec()
+			Flag.findOne({ story: req.params.id }).exec()
 			.then(function(flag) {
 				if(flag == null) {
-					tools.failRequest(req, res, "Story does not exist or is unflagged");
+					res.status(404).render('404');
+					return;
 				}
 				return flag.toObject();
 			})
 			.then(function(flag) {
 				if(flag == null) return null;
 				else {
-					return Story.findOne({ shortID: req.body.shortID }).exec()
+					return Story.findOne({ shortID: req.params.id }).exec()
 					.then(function(story) {
-						return [flag, story.toObject()];
+						if (story == null) return null; // story does not exist anymore
+						flag.story = story.toObject();
+						return flag;
 					});
 				}
 			})
-			.then(function(arr) {
-				if(arr == null) return null;
+			.then(function(flag) {
+				if(flag == null) return null;
 				else {
-					return User.findOne({ shortID: arr[1].author }).exec()
+					return User.findOne({ shortID: flag.story.author }).exec()
 					.then(function(user) {
-						arr.push(user.toObject());
-						return arr;
+						flag.user = user.toObject();
+						return flag;
 					});
 				}
 			})
-			.then(function(arr) {
-				if(arr) return null;
+			.then(function(flag) {
+				if(flag == null) return null;
 				else {
-					var flag = arr[0];
-					var story = arr[1];
-					var user = arr[2];
-					flag.story = story;
-					flag.story.author = user;
 					res.render('individualflag', flag);
 				}
 			})
@@ -75,6 +75,7 @@ module.exports = function(app) {
 		var errors = req.validationErrors();
 		if(!req.user) tools.failRequest(req, res, "Log in to flag a story");
 		else if(errors) tools.failRequest(req, res, errors);
+		else if (req.body.shortID == "00000") tools.failRequest(req, res, "You can't flag that, silly");
 		else {
 			Flag.findOne({story: req.body.shortID}).exec()
 			.then(function(flag) {
@@ -140,14 +141,27 @@ module.exports = function(app) {
 		}
 	});
 
-	app.post('/processflag', function(req, res) {
+	app.post('/flag/:id/process', function(req, res) {
+		req.user.admin = true; // remove later!
 		req.assert('status', 'Flag status required').notEmpty();
 		req.assert('shortID', 'Story shortID required').notEmpty();
 		req.assert('reason', 'Decision reason required').notEmpty();
 		var errors = req.validationErrors();
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
-		else {
+		else if(status == "dismiss") {
+			Story.find({ shortID: req.params.id }).remove().exec()
+			.then(function(status) {
+					return Flag.find({ shortID: req.params.id }).remove().exec().then(function(status) { return status; } );
+			})
+			.then(function(status) {
+				tools.completeRequest(req, res, null, "back", "Successfully dismissed flag");
+			})
+			.catch(function(status) {
+				console.log(status);
+				tools.failRequest(req, res, "Internal Error: Unable to dismiss flag.");
+			});
+		} else {
 			var query;
 			var continu = true;
 			if(status == "hide") query = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason}};
@@ -155,7 +169,7 @@ module.exports = function(app) {
 			else if(status == "dismiss") query = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}};
 			else continu = false;
 			if(continu) {
-				Story.count({ shortID: req.body.shortID }).exec()
+				Story.count({ shortID: req.params.id }).exec()
 				.then(function(count) {
 					if(count == 0) {
 						tools.failRequest(req, res, "Story does not exist");
@@ -165,10 +179,10 @@ module.exports = function(app) {
 				})
 				.then(function(status) {
 					if(status == 1) {
-						return Story.findOneAndUpdate({ shortID: req.body.shortID }, query).exec()
+						return Story.findOneAndUpdate({ shortID: req.params.id }, query).exec()
 						.then(function(status) {
 								return Flag.findOneAndUpdate({
-									shortID: req.body.shortID
+									shortID: req.params.id
 								}, {
 									$set: {}
 								}).exec().then(function(status) { return status; } );

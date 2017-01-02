@@ -8,10 +8,7 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 		User.findOne({shortID: req.params.id}).exec() // find the user
 		.then(function(user) {
 			if(!user && req.params.id != '00000') { // trying to access a nonexistent user
-				res.status(404).render('index', {
-					notfound: true,
-					currentID: req.params.shortID
-				});
+				res.status(404).render('404');
 			} else if(req.params.id == '00000') { // accessing Hatchling user
 				Story.find({shortID: '00000'}).exec()
 				.then(function(stories) {
@@ -19,7 +16,6 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 						display: 'Hatchling',
 						emoji: '🐣',
 						createdat: stories[0].createdat,
-						numberofstories: stories.length,
 						stories: stories
 					});
 				})
@@ -44,7 +40,6 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 						display: user.displayname,
 						emoji: user.emoji,
 						createdat: user.createdat,
-						numberofstories: arr[0].length,
 						stories: arr[0],
 						starred: arr[1]
 					});
@@ -61,7 +56,6 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 						display: user.displayname,
 						emoji: user.emoji,
 						createdat: user.createdat,
-						numberofstories: stories.length,
 						stories: stories
 					});
 				})

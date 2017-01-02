@@ -7,8 +7,8 @@
 <div id="profileheader">
 	<span class="emoji">{{emoji}}</span>
 	<h2>{{display}}</h2>
-	{{#if numberofstories}}
-		has written {{pluralize numberofstories "story" true}} since creating an account {{{timestamp createdat}}}
+	{{#if stories.length}}
+		has written {{pluralize stories.length "story" true}} since creating an account {{{timestamp createdat}}}
 	{{else}}
 		created an account {{{timestamp createdat}}}
 	{{/if}}
@@ -30,7 +30,7 @@
 {{/if}}
 
 <h3>Stories</h3>
-{{#if numberofstories}}
+{{#if stories.length}}
 <div class="listing">
 	{{#each stories}}
 	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
