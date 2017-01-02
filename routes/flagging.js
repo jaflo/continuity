@@ -141,7 +141,7 @@ module.exports = function(app) {
 		}
 	});
 
-	app.post('/flag/:id/process', function(req, res) {
+	app.post('/flag/process', function(req, res) {
 		req.user.admin = true; // remove later!
 		req.assert('status', 'Flag status required').notEmpty();
 		req.assert('shortID', 'Story shortID required').notEmpty();
@@ -150,41 +150,45 @@ module.exports = function(app) {
 		if(!(req.user && req.user.admin)) tools.failRequest(req, res, "You must log into an admin account to process flags.");
 		else if(errors) tools.failRequest(req, res, errors);
 		else {
-			var changes;
+			var changes = {$set: {flagstatus: 0, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
 			var continu = true;
 			if(req.body.status == "hide") {
-				changes = {$set: {flagstatus: 1, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+				changes["$set"].flagstatus = 1;
 			}
 			else if(req.body.status == "remove") {
-				changes = {$set: {flagstatus: 2, content: "[FLAGGED]", processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
+				changes["$set"].flagstatus = 2;
 			}
 			else if(req.body.status == "dismiss") {
-				changes = {$set: {flagstatus: 3, processedat: Date.now(), reason: req.body.reason}, reviewer: req.user.shortID};
+				changes["$set"].flagstatus = 3;
 			}
 			else continu = false;
 			if(continu) {
-				Story.count({ shortID: req.params.id }).exec()
+				Story.count({ shortID: req.body.shortID }).exec()
 				.then(function(count) {
 					if(count == 0) {
 						tools.failRequest(req, res, "Story does not exist");
-						return 0;
+						return null;
 					}
 					else return 1;
 				})
 				.then(function(status) {
-					if(status == 1) {
-						return Story.findOneAndUpdate({ shortID: req.params.id }, changes).exec()
-						.then(function(status) {
-								return Flag.findOneAndUpdate({
-									shortID: req.params.id
-								}, {
-									$set: {}
-								}).exec().then(function(status) { return status; } );
-						});
+					if(status) {
+						if(req.body.status == "remove") {
+							return Story.findOneAndUpdate({ shortID: req.body.shortID }, {content: "[FLAGGED]"}).exec()
+							.then(function(status) {
+								return 1;
+							});
+						} else return 1;
 					} else return null;
 				})
 				.then(function(status) {
-					if(status) tools.completeRequest(req, res, null, "back", "Successfully processed flag");
+					if(status) {
+						return Flag.findOneAndUpdate({ shortID: req.body.shortID }, changes).exec()
+						.then(function(status) { return 1; } );
+					} else return null;
+				})
+				.then(function(status) {
+					if(status) tools.completeRequest(req, res, null, "/story/"+req.body.shortID, "Successfully processed flag");
 				})
 				.catch(function(status) {
 					console.log(status);
