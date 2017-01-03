@@ -59,6 +59,10 @@ html, body, #wrapper {
 	box-sizing: border-box;
 }
 
+noscript {
+	margin-bottom: 1em;
+}
+
 textarea, input, button, .inputlike, select {
 	display: block;
 	width: 100%;
@@ -146,13 +150,72 @@ header, main, footer {
 }
 
 header {
-	text-align: center;
-	padding: 1em 0;
 	margin-bottom: 1em;
-	.bordered;
-	background: rgba(255,255,255,0.5);
-	h1, div {
-		padding: 0 @pad;
+	position: relative;
+	h1 {
+		height: 1em;
+		div {
+			height: 1em;
+			width: 1em;
+			text-align: center;
+			line-height: 1em;
+			position: fixed;
+			top: @pad;
+			margin-left: -(@pad+1em);
+			background: @maintextcolor;
+			border-radius: 99px;
+			cursor: pointer;
+			overflow: hidden;
+			&:before, &:after {
+				content: "";
+				display: block;
+				border: 2px solid @backgroundcolor;
+				border-radius: 99px;
+				position: absolute;
+			}
+			&:before {
+				width: 1em;
+				height: 1em;
+				top: -50%;
+				left: -50%;
+			}
+			&:after {
+				width: 2em;
+				height: 2em;
+				top: -90%;
+				left: 58%;
+			}
+		}
+		@media (max-width: 26em) {
+			span {
+				display: none;
+			}
+		}
+		@media (max-width: 37em) {
+			div {
+				position: absolute;
+				margin: 0;
+				top: @pad/2;
+			}
+			span {
+				padding-left: 1em+@pad;
+			}
+		}
+	}
+}
+
+#user {
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%) translateY(@pad);
+	a {
+		border: none;
+		display: inline-block;
+		text-transform: uppercase;
+		padding: 1em 0;
+		font-size: 0.8em;
+		margin-left: @pad/2;
 	}
 }
 
@@ -266,15 +329,11 @@ h2 {
 	}
 }
 
-#user {
-	padding-top: @pad;
-}
-
 #stacktrace {
 	overflow-x: scroll;
 }
 
-#login, #signup {
+#login, #signup, #update {
 	text-align: center;
 	label {
 		display: block;

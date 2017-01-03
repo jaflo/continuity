@@ -41,7 +41,8 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 						emoji: user.emoji,
 						createdat: user.createdat,
 						stories: arr[0],
-						starred: arr[1]
+						starred: arr[1],
+						seestars: true
 					});
 				})
 				.catch(function(err) {

@@ -14,8 +14,9 @@
 	{{/if}}
 </div>
 
+{{#if seestars}}
 <h3>Starred</h3>
-{{#if starred}}
+{{#if starred.length}}
 <div class="listing">
 	{{#each starred}}
 	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
@@ -27,6 +28,7 @@
 <div class="empty listing">
 	Star some stories!
 </div>
+{{/if}}
 {{/if}}
 
 <h3>Stories</h3>
