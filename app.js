@@ -1,7 +1,7 @@
 // Before starting, run the following command:
 // mongod --setParameter failIndexKeyTooLong=false
 
-console.log("Starting...");
+console.log("Loading modules...");
 
 var express = require('express');
 var path = require('path');
@@ -19,12 +19,17 @@ var hbs = require("hbs");
 var moment = require("moment");
 var minify = require("express-minify");
 var compression = require("compression");
+var fs = require("fs");
+
+console.log("Connecting to mongo...");
 
 mongoose.connect('mongodb://localhost/Continuity');
 mongoose.Promise = require('bluebird');
 var User = require('./models/user.js');
 var Story = require('./models/story.js');
 var Flag = require('./models/flag.js');
+
+console.log("Starting express...");
 
 var app = express();
 
@@ -58,6 +63,14 @@ app.use(session({
 	resave: true
 }));
 
+var emojimap = JSON.parse(
+	fs.readFileSync(
+		path.join(__dirname, "public", "lib", "emojimap.json"),
+	"utf8")
+), emojis = [];
+delete emojimap["information"];
+for (var key in emojimap) emojis.push(emojimap[key]);
+
 app.use(expressValidator({
 	errorFormatter: function(param, msg, value) {
 		var namespace = param.split('.'),
@@ -67,6 +80,11 @@ app.use(expressValidator({
 			formParam += '[' + namespace.shift() + ']';
 		}
 		return msg + " ";
+	},
+	customValidators: {
+		isEmoji: function(value) {
+			return emojis.indexOf(value) > -1;
+		}
 	}
 }));
 
@@ -86,6 +104,8 @@ app.use(function(req, res, next) {
 	res.locals.url = "http://localhost:3000" + req.originalUrl;
 	next();
 });
+
+console.log("Setting up database...");
 
 User.collection.drop(); //For testion purposes, deletes all previous users on startup
 Story.collection.drop(); //For testion purposes, deletes all previous stories on startup
@@ -109,7 +129,6 @@ Story.collection.count({}, function(err, count) {
 		process.emit("initialized");
 	}
 });
-
 
 // all routes
 require('./routes/main')(app);

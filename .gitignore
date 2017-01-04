@@ -27,10 +27,11 @@ build/Release
 node_modules
 
 # Debug log from npm
-npm-debug.log
+npm-debug.log*
 
 # Converted LESS file
 public/style.css
 
 # Cache folder
 cache/*
+!cache/whatisthis.txt

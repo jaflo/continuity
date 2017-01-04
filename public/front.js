@@ -377,7 +377,7 @@ $(document).ready(function() {
 			x = around.offset().left-container.offset().left+(e.offsetX||around.outerWidth()/2),
 			y = around.offset().top-container.offset().top+(e.offsetY||around.outerHeight()/2),
 			diameter = Math.sqrt(Math.pow(container.outerWidth(), 2) + Math.pow(container.outerHeight(), 2))*2;
-		if (color != "#AD343E" && color != "#4380BA") diameter = 500;
+		if (color != "#AD343E" && color != "#4380BA") diameter = 300;
 		bubble.css({
 			background: color ? color : "rgba(0,0,0,0.7)",
 			width: diameter,
@@ -407,8 +407,8 @@ $(document).ready(function() {
 		var snippet = $(".master.piece").clone();
 		snippet.removeClass("master").addClass("hidden").attr("id", "piece"+piece.shortID);
 		snippet.toggleClass("starred", piece.starred);
-		snippet.find(".author").attr("href", "/user/"+piece.author.id).find("i").text(piece.author.emoji);
-		snippet.find(".author").find("span").text("by "+piece.author.display);
+		snippet.find(".author a").attr("href", "/user/"+piece.author.id).text(piece.author.display);
+		snippet.find(".author span").text(piece.author.emoji);
 		snippet.find(".star").attr("title", piece.starred ? "Unstar" : "Star").find("span").text(piece.starcount);
 		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
@@ -457,7 +457,7 @@ $(document).ready(function() {
 
 	function message(msg, title) {
 		var hadFocus = $(":focus"), container = $("#message");
-		container.find(".contents").html(msg);
+		container.find(".contents").html(typeof msg == "array" ? msg.join("") : msg);
 		container.find(".header span").text(title || "Heyo!");
 		container.find(".box").removeClass("enter exit");
 		container.fadeIn(100);
@@ -471,6 +471,22 @@ $(document).ready(function() {
 			hadFocus.focus();
 		});
 	}
+
+	$("#update").submit(function(e) {
+		var form = $(this);
+		$.post("/user/update", form.serialize(), function(data) {
+			form.find("input, button").removeAttr("disabled");
+			if (data.status == "failed") {
+				message(data.message, "Failed to update");
+			} else {
+				toast("Updated profile.");
+			}
+		}, "json").fail(function() {
+			form.find("input, button").removeAttr("disabled");
+		});
+		form.find("input, button").attr("disabled", "disabled");
+		e.preventDefault();
+	});
 
 	if ($("#emojipicker").length > 0) {
 		$("#emoji").attr("type", "hidden");
@@ -517,6 +533,15 @@ $(document).ready(function() {
 			});
 		});
 	}
+
+	$("#flagprocess").submit(function() {
+		if ($(this).find("select").val() == "remove" && !$(".escalate input").is(":checked")) {
+			message("This will remove the story permanently. Only do this for illegal content.", "You sure?");
+			return false;
+		}
+	}).find("select").change(function() {
+		$(".escalate").toggle($(this).val() == "remove");
+	});
 
 	var toasts = [];
 	function toast(message) {

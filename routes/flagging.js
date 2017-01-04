@@ -3,6 +3,8 @@ var Story = require('../models/story.js');
 var Flag = require('../models/flag.js');
 var tools = require('../config/tools.js');
 
+var statusMap = ["flagged", "hidden", "removed", "dismissed"];
+
 module.exports = function(app) {
 	app.get('/flag', function(req, res) {
 		req.user.admin = true; // remove later!
@@ -10,6 +12,10 @@ module.exports = function(app) {
 		else {
 			Flag.find({}).exec()
 			.then(function(arr) {
+				for (var i = 0; i < arr.length; i++) {
+					arr[i] = arr[i].toObject();
+					arr[i].status = statusMap[arr[i].status];
+				}
 				res.render('flag', {
 					flags: arr
 				});
@@ -57,6 +63,7 @@ module.exports = function(app) {
 			.then(function(flag) {
 				if(flag == null) return null;
 				else {
+					flag.status = statusMap[flag.status];
 					res.render('individualflag', flag);
 				}
 			})

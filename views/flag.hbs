@@ -1,7 +1,16 @@
 <h2>Showing {{pluralize flags.length "flag" true}}</h2>
-{{#each flags}}
-<a href="/flag/{{story}}">
-	{{story}}, {{status}}, {{{timestamp processedat}}},
-	reported {{pluralize flaggings.length "time" true}}
-</a>
-{{/each}}
+{{#if flags}}
+<div id="flags" class="listing">
+	{{#each flags}}
+	<a href="/flag/{{story}}">
+		<div class="light {{status}}"></div>
+		{{status}}, {{{timestamp processedat}}},
+		reported {{pluralize flaggings.length "time" true}}
+	</a>
+	{{/each}}
+</div>
+{{else}}
+<div id="flags" class="empty listing">
+	No flags!
+</div>
+{{/if}}

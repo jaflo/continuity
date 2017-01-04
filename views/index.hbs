@@ -6,11 +6,9 @@
 {{else}}
 <div id="story">
 	<div class="master piece">
-		<div class="options">
-			<a href="#" class="author">
-				<i>😀</i>
-				<span></span>
-			</a>
+		<div class="author">
+			<span>😀</span> by
+			<a href="#"></a>
 		</div>
 		<div class="content"></div>
 		<div class="more controls">
@@ -31,11 +29,9 @@
 			This has been removed.
 		</div>
 		{{else}}
-		<div class="options">
-			<a href="/user/{{author.id}}" class="author">
-				<i>{{author.emoji}}</i>
-				<span>by {{author.display}}</span>
-			</a>
+		<div class="author">
+			<span>{{author.emoji}}</span> by
+			<a href="/user/{{author.id}}">{{author.display}}</a>
 		</div>
 		<div class="content">{{content}}</div>
 		<div class="more controls">

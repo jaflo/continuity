@@ -1,6 +1,7 @@
 <div class="info">
 	<h3>Overview</h3>
-	{{status}}{{#if reason}}: {{reason}}{{/if}}<br />
+	{{status}}{{#if reason}}: {{reason}}{{/if}}
+	<div class="light {{status}}"></div><br />
 	last reviewed {{{timestamp processedat}}}<br />
 	{{#if reviewer}}handled by {{reviewer}}<br />{{/if}}
 	reported {{pluralize flaggings.length "time" true}}
@@ -20,7 +21,7 @@
 	</ul>
 </div>
 
-<form class="" action="/flag/process" method="post">
+<form id="flagprocess" action="/flag/process" method="post">
 	<h3>Further actions</h3>
 	<input type="hidden" name="shortID" value="{{story.shortID}}" />
 	<div class="inputlike select">
@@ -32,5 +33,15 @@
 		</select>
 	</div>
 	<textarea name="reason" class="short" placeholder="Document the issue"></textarea>
+	<div class="escalate">
+		<div class="alert error">
+			You are about to perform an action that cannot be rolled back.
+			Are you sure you want to permanently remove this item?
+		</div>
+		<label for="confirm" class="inputlike checkbox">
+			<input type="checkbox" id="confirm" />
+			<span>I mean it</span>
+		</label>
+	</div>
 	<button type="submit">Process</button>
 </form>

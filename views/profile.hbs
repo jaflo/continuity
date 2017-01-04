@@ -5,12 +5,31 @@
 </div>
 {{else}}
 <div id="profileheader">
+	{{#if seestars}}
+	<form id="update" action="/user/update" method="post">
+		<label>Edit your profile</label>
+		<div id="emojipicker" class="inputlike">
+			<input type="text" id="emojisearch" placeholder="Search for an emoji" />
+			<div class="preview"></div>
+			<div class="loading results">loading...</div>
+		</div>
+		<input type="text" name="emoji" id="emoji" placeholder="{{emoji}}" value="{{emoji}}" />
+		<input type="text" name="displayname" id="displayname" placeholder="{{display}}" value="{{display}}" />
+		<button type="submit">Save</button>
+	</form>
+	{{#if stories.length}}
+		You have written {{pluralize stories.length "story" true}} since joining {{{timestamp createdat}}}
+	{{else}}
+		You created an account {{{timestamp createdat}}}
+	{{/if}}
+	{{else}}
 	<span class="emoji">{{emoji}}</span>
 	<h2>{{display}}</h2>
 	{{#if stories.length}}
 		has written {{pluralize stories.length "story" true}} since creating an account {{{timestamp createdat}}}
 	{{else}}
 		created an account {{{timestamp createdat}}}
+	{{/if}}
 	{{/if}}
 </div>
 

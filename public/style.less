@@ -241,6 +241,7 @@ h2 {
 	.bordered;
 	color: white;
 	background: #2c3e50;
+	margin-bottom: @pad;
 	&.error {
 		background: #c0392b;
 	}
@@ -350,6 +351,7 @@ h2 {
 
 .inputlike {
 	&.checkbox {
+		position: relative;
 		margin-bottom: @pad !important;
 		padding-left: @pad*2+1 !important;
 		input {
@@ -430,20 +432,12 @@ h2 {
 				color: inherit;
 			}
 		}
-		.options {
+		.author {
 			opacity: 0.8;
 			i {
 				font-style: normal;
 				display: inline-block;
-				width: 1.2em;
-			}
-			a {
-				border: none;
-			}
-			&.extended {
-				a {
-					display: block;
-				}
+				min-width: 1.2em;
 			}
 		}
 		.content, textarea {
@@ -510,6 +504,7 @@ h2 {
 			.transition;
 			&.fadeout {
 				opacity: 0;
+				transition-duration: 0.5s;
 			}
 			&.hidden {
 				transform: scale(0);
@@ -562,8 +557,17 @@ h2 {
 	}
 }
 
+#flagprocess .escalate {
+	display: none;
+}
+
 #profileheader {
 	text-align: center;
+	#displayname {
+		text-align: center;
+		font-size: 1.5em;
+		padding: @pad;
+	}
 	.emoji {
 		font-size: 2em;
 	}
@@ -608,7 +612,19 @@ h2 {
 	}
 }
 
+.light {
+	display: inline-block;
+	width: 0.6em;
+	height: 0.6em;
+	border-radius: 99px;
+	background: grey;
+	&.hidden { background: orange; }
+	&.removed { background: red; }
+	&.dismissed { background: green; }
+}
+
 #emojipicker {
+	display: none;
 	position: relative;
 	#emojisearch {
 		padding: 2em-@pad 0 @pad 0;

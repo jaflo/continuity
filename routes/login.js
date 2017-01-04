@@ -1,12 +1,5 @@
 var tools = require('../config/tools.js');
 var passport = require('passport');
-var fs = require('fs');
-
-var emojis = [];
-var emojimap = JSON.parse(fs.readFileSync('./public/lib/emojimap.json').toString());
-for (var key in emojimap) {
-	emojis.push(emojimap[key]);
-}
 
 module.exports = function(app) {
 	app.post("/login", passport.authenticate('local-login',
@@ -39,8 +32,7 @@ module.exports = function(app) {
 		req.assert('email', 'Emails cannot exceed 500 characters').isLength({min: undefined, max: 500});
 		//req.assert('email', 'Emails must be vaild').isEmail();
 		req.assert('emoji', 'Please enter one emoji').isLength({min: 1, max: 20});
-		// TODO: Need to check if valid emoji (not all emoji are of length 1)
-		req.assert('emoji', 'Please enter a vald emoji').isIn(emojis);
+		req.assert('emoji', 'Please enter a valid emoji').isEmoji();
 		req.flash("email", req.body.email);
 		req.flash("displayname", req.body.displayname);
 		req.flash("emoji", req.body.emoji);

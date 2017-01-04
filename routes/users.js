@@ -1,5 +1,6 @@
 var User = require('../models/user.js');
 var Story = require('../models/story.js');
+var tools = require('../config/tools.js');
 /*
 Author name, emoji, number of continuations written, continuations, account creation date
 */
@@ -70,5 +71,25 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 			console.log(err);
 			res.render('profile', { notfound: true });
 		});
+	});
+
+	app.post("/user/update", function(req, res) {
+		req.assert('emoji', 'You have to have an emoji.').notEmpty().isEmoji();
+		req.assert('displayname', 'You need some name.').notEmpty();
+		var errors = req.validationErrors();
+
+		if (!req.user) tools.failRequest(req, res, "Log in to update your profile");
+		else if(errors) tools.failRequest(req, res, errors);
+		else {
+			User.findOneAndUpdate({_id: req.session.passport.user}, {$set: {
+				"emoji": req.body.emoji,
+				"displayname": req.body.displayname
+			}}).exec().then(function(status) {
+				tools.completeRequest(req, res, null, "/user/"+req.user.shortID, "Successfully updated profile!");
+			}).catch(function(err) {
+				console.log(err);
+				tools.failRequest(req, res, "Internal Error: Unable to flag");
+			});;
+		}
 	});
 };
