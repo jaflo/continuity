@@ -88,7 +88,7 @@ module.exports = function(app) { // oh god im so sorry there's so many if statem
 				tools.completeRequest(req, res, null, "/user/"+req.user.shortID, "Successfully updated profile!");
 			}).catch(function(err) {
 				console.log(err);
-				tools.failRequest(req, res, "Internal Error: Unable to flag");
+				tools.failRequest(req, res, "Internal Error: Unable to update profile");
 			});;
 		}
 	});
