@@ -39,6 +39,13 @@ hbs.registerHelper("timestamp", function(time) {
 	var t = moment(time);
 	return '<time datetime="'+t.format()+'">'+t.fromNow()+"</time>";
 });
+hbs.registerHelper("format", function(context) {
+	var clean = new hbs.SafeString(context).toString();
+	clean = clean.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+	clean = clean.replace(/\*(.*?)\*/g, "<i>$1</i>");
+	clean = clean.replace(/__(.*?)__/g, "<u>$1</u>");
+	return clean;
+});
 hbs.registerHelper("pluralize", require("handlebars-helper-pluralize"));
 app.set("view engine", "hbs");
 

@@ -235,7 +235,11 @@ $(document).ready(function() {
 				element.height("auto");
 				var before = element.outerHeight() - 2*parseFloat(element.css("padding-top"));
 				var editable = $("<form class=editor><textarea>");
-				editable.find("textarea").val(element.find(".content").text());
+				var source = element.find(".content").html();
+				source = source.replace(/<b>(.*?)<\/b>/g, "**$1**");
+				source = source.replace(/<i>(.*?)<\/i>/g, "*$1*");
+				source = source.replace(/<u>(.*?)<\/u>/g, "__$1__");
+				editable.find("textarea").val(source);
 				element.find(".content").hide().after(editable);
 				editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
 				var bar = element.find(".contextual").show(), button = $("<button type=button><i>");
@@ -412,6 +416,11 @@ $(document).ready(function() {
 		snippet.find(".star").attr("title", piece.starred ? "Unstar" : "Star").find("span").text(piece.starcount);
 		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
+		var clean = snippet.find(".content").html();
+		clean = clean.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+		clean = clean.replace(/\*(.*?)\*/g, "<i>$1</i>");
+		clean = clean.replace(/__(.*?)__/g, "<u>$1</u>");
+		snippet.find(".content").html(clean);
 		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
 		if (!piece.mine) snippet.find(".edit, .delete").remove();
 		if (piece.flagstatus == 1) {
