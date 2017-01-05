@@ -32,19 +32,30 @@ $(document).ready(function() {
 		}
 	});
 
+	if (typeof loadedRecaptcha != "undefined" && loadedRecaptcha) $("#signup button").removeAttr("disabled");
+
 	$("#login, #signup").submit(function(e) {
 		if ($(this).find("button").attr("disabled")) {
 			e.preventDefault();
 		} else {
-			var list = $("<ul>"), missing = 0;
+			var msg = $("<div>"), list = $("<ul>"), missing = false;
 			$(this).children("input").each(function() {
 				if (!$(this).val()) {
 					list.append($("<li>").text($("label[for="+$(this).attr("name")+"]").text().toLowerCase()));
-					missing++;
+					missing = true;
 				}
 			});
+			if (missing) msg.text("You did not enter anything for").append(list);
+			if ($("#password").val().length < 6) {
+				msg.append("Your password is too short. Enter more than 6 characters. ");
+				missing = true;
+			}
+			if (typeof solvedCaptcha != "undefined" && !solvedCaptcha) {
+				msg.append("Please solve the captcha.");
+				missing = true;
+			}
 			if (missing) {
-				message($("<div>").text("You did not enter anything for").append(list), "Missing information");
+				message(msg, "Missing information");
 				e.preventDefault();
 			} else {
 				$(this).find("button").attr("disabled", "disabled");
