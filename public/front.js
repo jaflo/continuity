@@ -1,6 +1,5 @@
 $(document).ready(function() {
-	var hasSeenNewest = true, scrollable = $("#wrapper"),
-		historyManipulated = false,
+	var hasSeenNewest = true, scrollable = $("#wrapper"), historyManipulated = false,
 		currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
 		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
@@ -16,6 +15,8 @@ $(document).ready(function() {
 	tofocus.focus();
 
 	$("time").timeago();
+
+	$("a.emailus").attr("href", "mailto:"+$("a.emailus").text().replace("bot", ""));
 
 	$(document).ajaxError(function(e, jqXHR) {
 		console.log(jqXHR);

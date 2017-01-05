@@ -25,8 +25,8 @@ module.exports = function(app) {
 		});
     });
 
-	app.get('/help', function(req, res, next) {
-		res.render('help');
+	app.get('/more', function(req, res, next) {
+		res.render('more');
 	});
 
     app.get('/story/:id', function(req, res, next) {
