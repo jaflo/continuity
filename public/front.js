@@ -165,16 +165,21 @@ $(document).ready(function() {
 		window.location.reload();
 	});
 
+	$(".piece .banner a").click(function() {
+		$(this).parents(".piece").removeClass("sensitive").find(".banner").remove();
+		return false;
+	});
+
 	function attachEventHandlers(elements) {
 		$(elements).not(".master").each(function() {
 			var element = $(this),
 				id = element.attr("id").replace("piece", "");
-			if (element.hasClass("sensitive")) element.find(".banner a").click(function() {
+			if (element.hasClass("sensitive")) element.find(".banner a").unbind("click").click(function() {
 				element.removeClass("sensitive").find(".banner").remove();
 				return false;
 			});
-			element.click(function() {
-				if (!canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
+			element.click(function(e) {
+				if ($(e.target).is(".author a") || !canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
 				var previous = $("#story .highlighed.piece");
 				if (!element.hasClass("highlighed")) {
 					element.height("auto");

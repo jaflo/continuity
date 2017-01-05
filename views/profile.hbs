@@ -37,11 +37,7 @@
 <h3>Starred</h3>
 {{#if starred.length}}
 <div class="listing">
-	{{#each starred}}
-	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
-		{{content}}
-	</a>
-	{{/each}}
+	{{#each starred}}{{{inlinepiece this}}}{{/each}}
 </div>
 {{else}}
 <div class="empty listing">
@@ -53,11 +49,7 @@
 <h3>Stories</h3>
 {{#if stories.length}}
 <div class="listing">
-	{{#each stories}}
-	<a class="piece" id="piece{{shortID}}" href="/story/{{shortID}}">
-		{{content}}
-	</a>
-	{{/each}}
+	{{#each stories}}{{{inlinepiece this}}}{{/each}}
 </div>
 {{else}}
 <div class="empty listing">
