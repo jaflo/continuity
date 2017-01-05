@@ -39,6 +39,24 @@ hbs.registerHelper("timestamp", function(time) {
 	var t = moment(time);
 	return '<time datetime="'+t.format()+'">'+t.fromNow()+"</time>";
 });
+function cleanAndFormat(content) {
+	var clean = new hbs.SafeString(content).toString();
+	clean = clean.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+	clean = clean.replace(/\*(.*?)\*/g, "<i>$1</i>");
+	clean = clean.replace(/__(.*?)__/g, "<u>$1</u>");
+	return clean;
+}
+hbs.registerHelper("format", cleanAndFormat);
+hbs.registerHelper("inlinepiece", function(piece) {
+	var out = '<a class="piece';
+	if (piece.status == 1) out += "sensitive";
+	else if (piece.status == 2) out += "removed";
+	out += '" id="piece'+piece.shortID+'" href="/story/'+piece.shortID+'">';
+	if (piece.status == 1) out += '<div class="banner">This contains sensitive content.<a href="#">Show anyways</a></div>';
+	else if (piece.status == 2) out += '<div class="banner">This has been removed.</div>';
+	if (piece.status != 2) out += '<div>'+cleanAndFormat(piece.content)+'</div>';
+	return out+'</a>';
+});
 hbs.registerHelper("pluralize", require("handlebars-helper-pluralize"));
 app.set("view engine", "hbs");
 

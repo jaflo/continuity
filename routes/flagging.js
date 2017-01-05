@@ -7,7 +7,6 @@ var statusMap = ["flagged", "hidden", "removed", "dismissed"];
 
 module.exports = function(app) {
 	app.get('/flag', function(req, res) {
-		req.user.admin = true; // remove later!
 		if(!(req.user && req.user.admin)) res.status(404).render('404');
 		else {
 			Flag.find({}).exec()
@@ -28,7 +27,6 @@ module.exports = function(app) {
 	});
 
 	app.get('/flag/:id', function(req, res) {
-		req.user.admin = true; // remove later!
 		if(!(req.user && req.user.admin)) res.status(404).render('404');
 		else {
 			Flag.findOne({ story: req.params.id }).exec()
@@ -149,7 +147,6 @@ module.exports = function(app) {
 	});
 
 	app.post('/flag/process', function(req, res) {
-		req.user.admin = true; // remove later!
 		req.assert('status', 'Flag status required').notEmpty();
 		req.assert('shortID', 'Story shortID required').notEmpty();
 		req.assert('reason', 'Decision reason required').notEmpty();

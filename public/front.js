@@ -1,6 +1,5 @@
 $(document).ready(function() {
-	var hasSeenNewest = true, scrollable = $("#wrapper"),
-		historyManipulated = false,
+	var hasSeenNewest = true, scrollable = $("#wrapper"), historyManipulated = false,
 		currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
 		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
@@ -16,6 +15,8 @@ $(document).ready(function() {
 	tofocus.focus();
 
 	$("time").timeago();
+
+	$("a.emailus").attr("href", "mailto:"+$("a.emailus").text().replace("bot", ""));
 
 	$(document).ajaxError(function(e, jqXHR) {
 		console.log(jqXHR);
@@ -164,16 +165,21 @@ $(document).ready(function() {
 		window.location.reload();
 	});
 
+	$(".piece .banner a").click(function() {
+		$(this).parents(".piece").removeClass("sensitive").find(".banner").remove();
+		return false;
+	});
+
 	function attachEventHandlers(elements) {
 		$(elements).not(".master").each(function() {
 			var element = $(this),
 				id = element.attr("id").replace("piece", "");
-			if (element.hasClass("sensitive")) element.find(".banner a").click(function() {
+			if (element.hasClass("sensitive")) element.find(".banner a").unbind("click").click(function() {
 				element.removeClass("sensitive").find(".banner").remove();
 				return false;
 			});
-			element.click(function() {
-				if (!canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
+			element.click(function(e) {
+				if ($(e.target).is(".author a") || !canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
 				var previous = $("#story .highlighed.piece");
 				if (!element.hasClass("highlighed")) {
 					element.height("auto");
@@ -235,7 +241,11 @@ $(document).ready(function() {
 				element.height("auto");
 				var before = element.outerHeight() - 2*parseFloat(element.css("padding-top"));
 				var editable = $("<form class=editor><textarea>");
-				editable.find("textarea").val(element.find(".content").text());
+				var source = element.find(".content").html();
+				source = source.replace(/<b>(.*?)<\/b>/g, "**$1**");
+				source = source.replace(/<i>(.*?)<\/i>/g, "*$1*");
+				source = source.replace(/<u>(.*?)<\/u>/g, "__$1__");
+				editable.find("textarea").val(source);
 				element.find(".content").hide().after(editable);
 				editable.after($(".master .more").clone().removeClass("controls").addClass("pos contextual"));
 				var bar = element.find(".contextual").show(), button = $("<button type=button><i>");
@@ -412,6 +422,11 @@ $(document).ready(function() {
 		snippet.find(".star").attr("title", piece.starred ? "Unstar" : "Star").find("span").text(piece.starcount);
 		snippet.find(".star i").removeClass().addClass(piece.starred ? "icon-star_border" : "icon-star");
 		snippet.find(".content").text(piece.content);
+		var clean = snippet.find(".content").html();
+		clean = clean.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+		clean = clean.replace(/\*(.*?)\*/g, "<i>$1</i>");
+		clean = clean.replace(/__(.*?)__/g, "<u>$1</u>");
+		snippet.find(".content").html(clean);
 		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
 		if (!piece.mine) snippet.find(".edit, .delete").remove();
 		if (piece.flagstatus == 1) {
