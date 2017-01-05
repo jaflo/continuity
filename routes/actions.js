@@ -148,9 +148,6 @@ module.exports = function(app) {
 					tools.failRequest(req, res, "This story does not exist");
 					return -1;
 				} else if(story.author != req.user.shortID) {
-					console.log(story.author);
-					console.log(story);
-					console.log(req.user.shortID);
 					tools.failRequest(req, res, "You do not have permission to edit this story");
 					return -1;
 				} else {

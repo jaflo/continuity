@@ -171,7 +171,6 @@ module.exports = function(app) {
 				storychanges["$set"].flagstatus = 3;
 			}
 			else continu = false;
-			console.log(flagchanges);
 			if(continu) {
 				Story.count({ shortID: req.body.shortID }).exec()
 				.then(function(count) {
@@ -198,8 +197,8 @@ module.exports = function(app) {
 				.then(function(status) {
 					if(status) tools.completeRequest(req, res, null, "/flag/"+req.body.shortID, "Successfully processed flag");
 				})
-				.catch(function(status) {
-					console.log(status);
+				.catch(function(err) {
+					console.log(err);
 					tools.failRequest(req, res, "Internal Error: Unable to process flag.");
 				});
 			} else tools.failRequest(req, res, "Insert a valid status");
