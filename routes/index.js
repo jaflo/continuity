@@ -136,7 +136,6 @@ function getParentStory(req, newStory, storyArray, callback, render) { // recurs
 			storyArray.unshift(newStory);
 			callback(req, newParentStory, storyArray, callback, render);
 		}).catch(function(err) {
-			console.log('ERROR: Parent story could not be found');
 			console.log(err);
 		});
 	} else {

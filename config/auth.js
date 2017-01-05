@@ -57,7 +57,6 @@ module.exports = function(passport, LocalStrategy) {
 							}
 						})
 						.catch(function(err) {
-							console.log('Error!');
 							console.log(err);
 							return done(err);
 						});
@@ -66,7 +65,6 @@ module.exports = function(passport, LocalStrategy) {
 				}
 			})
 			.catch(function(err) {
-				console.log('Error!');
 				console.log(err);
 				return done(err);
 			});
