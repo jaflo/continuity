@@ -1,7 +1,7 @@
 var tools = require('../config/tools.js');
 var passport = require('passport');
 var simple_recaptcha = require('simple-recaptcha-new');
-var PRIVATE_KEY = 'YOUR_PRIVATE_KEY';
+var PRIVATE_KEY = '6LfEwhAUAAAAALOzlh7iNvjQ04mIxABtfj5_WG_q';
 
 module.exports = function(app) {
 	app.post("/login", passport.authenticate('local-login',
