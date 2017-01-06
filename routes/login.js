@@ -82,14 +82,15 @@ module.exports = function(app) {
 			.then(function(user) {
 				if (!user) {
 					tools.failRequest(req, res, 'No account with that email address exists.');
-				}
-				user.resetPasswordToken = token;
-				user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-				user.changedat = Date.now(); // 1 hour
+				} else {
+					user.resetPasswordToken = token;
+					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+					user.changedat = Date.now(); // 1 hour
 
-				user.save(function(err) {
-					if(err) handleError(err); else sendMail(token, user);
-				});
+					user.save(function(err) {
+						if(err) handleError(err); else sendMail(token, user);
+					});
+				}
 			})
 			.catch(function(err) {
 				handleError(err);
