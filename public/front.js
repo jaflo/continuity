@@ -32,19 +32,30 @@ $(document).ready(function() {
 		}
 	});
 
+	if (typeof loadedRecaptcha != "undefined" && loadedRecaptcha) $("#signup button").removeAttr("disabled");
+
 	$("#login, #signup").submit(function(e) {
 		if ($(this).find("button").attr("disabled")) {
 			e.preventDefault();
 		} else {
-			var list = $("<ul>"), missing = 0;
+			var msg = $("<div>"), list = $("<ul>"), missing = false;
 			$(this).children("input").each(function() {
 				if (!$(this).val()) {
 					list.append($("<li>").text($("label[for="+$(this).attr("name")+"]").text().toLowerCase()));
-					missing++;
+					missing = true;
 				}
 			});
+			if (missing) msg.text("You did not enter anything for").append(list);
+			if ($("#password").val().length < 6) {
+				msg.append("Your password is too short. Enter more than 6 characters. ");
+				missing = true;
+			}
+			if (typeof solvedCaptcha != "undefined" && !solvedCaptcha) {
+				msg.append("Please solve the captcha.");
+				missing = true;
+			}
 			if (missing) {
-				message($("<div>").text("You did not enter anything for").append(list), "Missing information");
+				message(msg, "Missing information");
 				e.preventDefault();
 			} else {
 				$(this).find("button").attr("disabled", "disabled");
@@ -180,14 +191,14 @@ $(document).ready(function() {
 			});
 			element.click(function(e) {
 				if ($(e.target).is(".author a") || !canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
-				var previous = $("#story .highlighed.piece");
-				if (!element.hasClass("highlighed")) {
+				var previous = $("#story .highlighted.piece");
+				if (!element.hasClass("highlighted")) {
 					element.height("auto");
 					var before = element.outerHeight();
 					element.find(".controls").show();
 					var after = element.outerHeight();
 					element.height(before);
-					element.addClass("highlighed").height(after);
+					element.addClass("highlighted").height(after);
 					element.unbind(transitionend).on(transitionend, function() {
 						element.height("auto");
 					});
@@ -197,13 +208,13 @@ $(document).ready(function() {
 					previous.height("auto");
 					var visible = previous.find("> div:visible, > form:visible"), hidden = previous.find("> div:hidden");
 					var before = previous.outerHeight() - 2*parseFloat(previous.css("padding-top"));
-					previous.removeClass("highlighed").find(".more, .editor").hide();
+					previous.removeClass("highlighted").find(".more, .editor").hide();
 					previous.find(".content").show();
 					var after = previous.outerHeight() - 2*parseFloat(previous.find(".controls").css("padding-top"));
 					visible.show();
 					hidden.hide();
 					previous.height(before);
-					previous.removeClass("highlighed");
+					previous.removeClass("highlighted");
 					previous.height(after);
 					previous.unbind(transitionend).on(transitionend, function() {
 						previous.height("auto");
@@ -468,6 +479,8 @@ $(document).ready(function() {
 			historyManipulated = true;
 			history.pushState({}, id, url);
 		}
+		if (url == "/") url = "";
+		$("title").text($("meta[property='og:title']").attr("content")+url);
 	}
 
 	function message(msg, title) {

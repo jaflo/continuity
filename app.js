@@ -119,6 +119,7 @@ app.use(function(req, res, next) {
 	res.locals.displayname = req.flash('displayname');
 	res.locals.emoji = req.flash('emoji');
 	res.locals.user = req.user;
+	res.locals.path = req.originalUrl == "/" ? "" : req.originalUrl;
 	res.locals.url = "http://localhost:3000" + req.originalUrl;
 	next();
 });
