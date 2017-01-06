@@ -1,0 +1,24 @@
+<form id="forgot" class="large" action="/forgot" method="post">
+	<h2>Forgot password</h2>
+	<p>
+		<a href="/login">Remembered it again?</a>
+	</p>
+	<label for="email">Email</label>
+	<input type="email" name="email" id="email" placeholder="kittenlover23@example.com" class="getfocus" value="{{email}}" />
+	<script>
+	var solvedCaptcha = false, loadedRecaptcha = false;
+	function loaded() {
+		grecaptcha.render("captcha", {
+			"sitekey": "6LfEwhAUAAAAADb7sck8_dqm-Y_U6VuuEJIDiHj8",
+			"callback": function() {
+				solvedCaptcha = true;
+			}
+		});
+		loadedRecaptcha = true;
+		$("#forgot button").removeAttr("disabled");
+	}
+	</script>
+	<script src="https://www.google.com/recaptcha/api.js?onload=loaded&render=explicit" async defer></script>
+	<div id="captcha"></div>
+	<button type="submit" class="primary" disabled>Request reset</button>
+</form>

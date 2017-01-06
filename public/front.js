@@ -3,8 +3,7 @@ $(document).ready(function() {
 		currentID = location.pathname.length > 4 ? location.pathname.replace("/story/", "") : "00000",
 		tofocus = $(".getfocus"), count = 0, writesaver, storyarea = $("#story"),
 		actionform = $("#next"), writestoryarea = actionform.find("textarea"),
-		origboxheight = writestoryarea.innerHeight(), prevText = "",
-		valuechange = "keyup keydown keypress", canclose = true,
+		valuechange = "keyup keydown keypress", canclose = true, prevText = "",
 		transitionend = "webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend",
 		localstore = $("#user").hasClass("loggedout") && typeof(Storage) !== "undefined";
 
@@ -32,7 +31,7 @@ $(document).ready(function() {
 		}
 	});
 
-	if (typeof loadedRecaptcha != "undefined" && loadedRecaptcha) $("#signup button").removeAttr("disabled");
+	if (typeof loadedRecaptcha != "undefined" && loadedRecaptcha) $("form.large button").removeAttr("disabled");
 
 	$("#login, #signup").submit(function(e) {
 		if ($(this).find("button").attr("disabled")) {
@@ -139,6 +138,7 @@ $(document).ready(function() {
 						message(data.message, "Failed to create");
 					} else {
 						writestoryarea.val("").keypress();
+						actionform.find("select").val("fine");
 						var id = currentID;
 						renderPiece(data.data);
 						localStorage.removeItem("save_"+id);
@@ -440,10 +440,10 @@ $(document).ready(function() {
 		snippet.find(".content").html(clean);
 		snippet.find("time").attr("datetime", new Date(piece.createdat).toISOString()).text($.timeago(new Date(piece.createdat)));
 		if (!piece.mine) snippet.find(".edit, .delete").remove();
-		if (piece.flagstatus == 1) {
+		if (piece.flagstatus == 1 || piece.flagstatus == 2) {
 			snippet.append("<div class=banner>This contains sensitive content. <a href=#>Show anyways</a></div>");
 			snippet.addClass("sensitive");
-		} else if (piece.flagstatus == 2) {
+		} else if (piece.flagstatus == 3) {
 			snippet.html("<div class=banner>This has been removed.</div>");
 			snippet.addClass("removed");
 		}
@@ -479,8 +479,6 @@ $(document).ready(function() {
 			historyManipulated = true;
 			history.pushState({}, id, url);
 		}
-		if (url == "/") url = "";
-		$("title").text($("meta[property='og:title']").attr("content")+url);
 	}
 
 	function message(msg, title) {

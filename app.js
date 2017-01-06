@@ -49,12 +49,12 @@ function cleanAndFormat(content) {
 hbs.registerHelper("format", cleanAndFormat);
 hbs.registerHelper("inlinepiece", function(piece) {
 	var out = '<a class="piece';
-	if (piece.status == 1) out += "sensitive";
-	else if (piece.status == 2) out += "removed";
+	if (piece.status == 1 || piece.status == 2) out += "sensitive";
+	else if (piece.status == 3) out += "removed";
 	out += '" id="piece'+piece.shortID+'" href="/story/'+piece.shortID+'">';
-	if (piece.status == 1) out += '<div class="banner">This contains sensitive content.<a href="#">Show anyways</a></div>';
-	else if (piece.status == 2) out += '<div class="banner">This has been removed.</div>';
-	if (piece.status != 2) out += '<div>'+cleanAndFormat(piece.content)+'</div>';
+	if (piece.status == 1|| piece.status == 2) out += '<div class="banner">This contains sensitive content.<a href="#">Show anyways</a></div>';
+	else if (piece.status == 3) out += '<div class="banner">This has been removed.</div>';
+	if (piece.status != 3) out += '<div>'+cleanAndFormat(piece.content)+'</div>';
 	return out+'</a>';
 });
 hbs.registerHelper("pluralize", require("handlebars-helper-pluralize"));
@@ -119,7 +119,6 @@ app.use(function(req, res, next) {
 	res.locals.displayname = req.flash('displayname');
 	res.locals.emoji = req.flash('emoji');
 	res.locals.user = req.user;
-	res.locals.path = req.originalUrl == "/" ? "" : req.originalUrl;
 	res.locals.url = "http://localhost:3000" + req.originalUrl;
 	next();
 });

@@ -1,0 +1,9 @@
+<form id="resetpassword" class="large" action="/resetpassword" method="post">
+	<h2>Reset password</h2>
+	<label for="password">Password</label>
+	<input type="password" name="password" class="getfocus" id="password" placeholder="•••••••" />
+	<label for="reentered">Re-enter Password</label>
+	<input type="password" name="reentered" id="reentered" placeholder="•••••••" />
+	<input type="hidden" name="token" value="{{token}}" />
+	<button type="submit" class="primary">Reset password</button>
+</form>
