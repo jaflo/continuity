@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs');
 
-var SALT_LEVEL = 10;
+var SALT_FACTOR = 10;
 
 var subSchema = mongoose.Schema({
     parent: {
@@ -11,7 +11,6 @@ var subSchema = mongoose.Schema({
         type: String
     }
 }, { _id : false });
-
 
 var userSchema = mongoose.Schema({
 	displayname: {
@@ -42,6 +41,12 @@ var userSchema = mongoose.Schema({
         unique: true,
         minlength: 6
     },
+	resetPasswordToken: {
+		type: String
+	},
+	resetPasswordExpires: {
+		type: Date
+	},
     createdat: {
         type: Date,
         required: true,
@@ -66,13 +71,12 @@ var userSchema = mongoose.Schema({
 // methods ======================
 // generating a hash
 userSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_LEVEL), null);
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_FACTOR), null);
 };
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
-
 
 module.exports = mongoose.model('User', userSchema);

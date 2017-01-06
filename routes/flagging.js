@@ -118,8 +118,8 @@ module.exports = function(app) {
 						if(flag.flaggings[i].flagger == req.user.shortID) exists = true;
 					}
 					if(exists) tools.failRequest(req, res, "You've already flagged this story"); // users cannot flag a story more than once
-					else if(flag.status == 2) tools.failRequest(req, res, "This story has already been removed.");
-					else if(flag.status == 3) tools.failRequest(req, res, "This story has already been reviewed to be good.");
+					else if(flag.status == 3) tools.failRequest(req, res, "This story has already been removed.");
+					else if(flag.status == 4) tools.failRequest(req, res, "This story has already been reviewed to be good.");
 					else {
 						Flag.findOneAndUpdate(
 							{story: req.body.shortID},
@@ -157,20 +157,20 @@ module.exports = function(app) {
 			var flagchanges = {$set: {status: 0, processedat: Date.now(), reason: req.body.reason, reviewer: req.user.shortID}};
 			var storychanges = {$set: {flagstatus: 0, changedat: Date.now()}};
 			var continu = true;
-			if(req.body.status == "hide") {
+			if(req.body.status == "violence") {
 				flagchanges["$set"].status = 1;
 				storychanges["$set"].flagstatus = 1;
-			}
-			else if(req.body.status == "remove") {
+			} else if(req.body.status == "nudity") {
 				flagchanges["$set"].status = 2;
 				storychanges["$set"].flagstatus = 2;
-				storychanges["$set"]["content"] = "[FLAGGED]";
-			}
-			else if(req.body.status == "dismiss") {
+			} else if(req.body.status == "remove") {
 				flagchanges["$set"].status = 3;
 				storychanges["$set"].flagstatus = 3;
-			}
-			else continu = false;
+				storychanges["$set"]["content"] = "[FLAGGED]";
+			} else if(req.body.status == "dismiss") {
+				flagchanges["$set"].status = 4;
+				storychanges["$set"].flagstatus = 4;
+			} else continu = false;
 			if(continu) {
 				Story.count({ shortID: req.body.shortID }).exec()
 				.then(function(count) {

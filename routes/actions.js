@@ -184,8 +184,10 @@ function attemptCreation(req, res, shortID) {
 				author: req.user.shortID,
 				content: req.body.content,
 				createdat: Date.now(),
-				changedat: Date.now()
+				changedat: Date.now(),
+				flagstatus: (req.body.contentwarning=='violence')?1:(req.body.contentwarning=='nudity')?2:0
 			});
+
 			newStory.save(function(error, test) {
 				if(error) {
 					console.log(error);
