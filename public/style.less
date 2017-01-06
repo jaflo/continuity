@@ -63,6 +63,13 @@ noscript {
 	margin-bottom: 1em;
 }
 
+#intro {
+	padding: @pad;
+	margin: 0 -@pad 1em -@pad;
+	.bordered;
+	color: rgba(0,0,0,0.6);
+}
+
 u {
 	text-decoration: none;
 	border-bottom: 1px solid;
@@ -220,7 +227,7 @@ header {
 		text-transform: uppercase;
 		padding: 1em 0;
 		font-size: 0.8em;
-		margin-left: @pad/2;
+		margin-left: @pad;
 	}
 }
 
@@ -405,7 +412,8 @@ h2 {
 		position: relative;
 		.transition;
 		overflow: hidden;
-		&.highlighed {
+		margin-bottom: 0.1em;
+		&.highlighted {
 			background: white;
 			margin: @pad -@pad 2*@pad -@pad;
 			padding: @pad;
@@ -419,6 +427,7 @@ h2 {
 			opacity: 0;
 		}
 		.author {
+			font-size: 0.9em;
 			opacity: 0.8;
 			i {
 				font-style: normal;

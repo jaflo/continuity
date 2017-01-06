@@ -191,14 +191,14 @@ $(document).ready(function() {
 			});
 			element.click(function(e) {
 				if ($(e.target).is(".author a") || !canclose || element.hasClass("sensitive") || element.hasClass("removed")) return;
-				var previous = $("#story .highlighed.piece");
-				if (!element.hasClass("highlighed")) {
+				var previous = $("#story .highlighted.piece");
+				if (!element.hasClass("highlighted")) {
 					element.height("auto");
 					var before = element.outerHeight();
 					element.find(".controls").show();
 					var after = element.outerHeight();
 					element.height(before);
-					element.addClass("highlighed").height(after);
+					element.addClass("highlighted").height(after);
 					element.unbind(transitionend).on(transitionend, function() {
 						element.height("auto");
 					});
@@ -208,13 +208,13 @@ $(document).ready(function() {
 					previous.height("auto");
 					var visible = previous.find("> div:visible, > form:visible"), hidden = previous.find("> div:hidden");
 					var before = previous.outerHeight() - 2*parseFloat(previous.css("padding-top"));
-					previous.removeClass("highlighed").find(".more, .editor").hide();
+					previous.removeClass("highlighted").find(".more, .editor").hide();
 					previous.find(".content").show();
 					var after = previous.outerHeight() - 2*parseFloat(previous.find(".controls").css("padding-top"));
 					visible.show();
 					hidden.hide();
 					previous.height(before);
-					previous.removeClass("highlighed");
+					previous.removeClass("highlighted");
 					previous.height(after);
 					previous.unbind(transitionend).on(transitionend, function() {
 						previous.height("auto");
@@ -479,6 +479,8 @@ $(document).ready(function() {
 			historyManipulated = true;
 			history.pushState({}, id, url);
 		}
+		if (url == "/") url = "";
+		$("title").text($("meta[property='og:title']").attr("content")+url);
 	}
 
 	function message(msg, title) {
