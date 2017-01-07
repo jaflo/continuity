@@ -4,6 +4,8 @@ var passport = require('passport');
 var simple_recaptcha = require('simple-recaptcha-new');
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
+var mg = require('nodemailer-mailgun-transport');
+
 var PRIVATE_KEY = '6LfEwhAUAAAAALOzlh7iNvjQ04mIxABtfj5_WG_q';
 
 module.exports = function(app) {
@@ -69,6 +71,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/forgot', function(req, res, next) {
+		var ip = req.ip; // this is an optional parameter
+		var response = req.body['g-recaptcha-response'];
+
 		simple_recaptcha(PRIVATE_KEY, ip, response, function(err) {
 			if (err) return tools.failRequest(req, res, err.message);
 
@@ -81,17 +86,25 @@ module.exports = function(app) {
 			}
 
 			function setToken(token) {
-				User.findOne({ email: req.body.email }).exec()
+				User.findOne({ resetPasswordToken: token }).exec()
 				.then(function(user) {
-					if (!user) {
-						tools.failRequest(req, res, 'No account with that email address exists.');
-					} else {
-						user.resetPasswordToken = token;
-						user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-						user.changedat = Date.now(); // 1 hour
+					if(user) createToken();
+					else {
+						User.findOne({ email: req.body.email }).exec()
+						.then(function(user) {
+							if (!user) {
+								tools.failRequest(req, res, 'No account with that email address exists.');
+							} else {
+								user.resetPasswordToken = token;
+								user.changedat = Date.now();
 
-						user.save(function(err) {
-							if(err) handleError(err); else sendMail(token, user);
+								user.save(function(err) {
+									if(err) handleError(err); else sendMail(token, user);
+								});
+							}
+						})
+						.catch(function(err) {
+							handleError(err);
 						});
 					}
 				})
@@ -101,16 +114,17 @@ module.exports = function(app) {
 			}
 
 			function sendMail(token, user) {
-				var smtpTransport = nodemailer.createTransport('SMTP', {
-					service: 'Mailgun',
+				var auth = {
 					auth: {
-						user: 'postmaster@sandbox92d0ac14949744d6b790ead9cfaf6eca.mailgun.org',
-						pass: 'c79e89becaad90491054247a711cc1db'
+						api_key: 'key-1a89c47c55776e7eabdf99f6b6551127',
+					    domain: 'continuity.loud.red'
 					}
-				});
+				};
+
+				var smtpTransport = nodemailer.createTransport(mg(auth));
 				var mailOptions = {
 					to: user.email,
-					from: 'noreply@loud.red',
+					from: 'noreply@continuity.loud.red',
 					subject: 'Continuity Password Reset',
 					text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
 					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -119,7 +133,7 @@ module.exports = function(app) {
 				};
 				smtpTransport.sendMail(mailOptions, function(err) {
 					if(err) handleError(err);
-					else tools.completeRequest(req, res, null, "back", "You have been sent an email with further instructions.");
+					else tools.completeRequest(req, res, null, "/login", "You have been sent an email with further instructions.");
 				});
 			}
 
@@ -133,18 +147,23 @@ module.exports = function(app) {
 	});
 
 	app.get('/reset/:token', function(req, res) {
-		User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+		User.findOne({ resetPasswordToken: req.params.token }).exec()
+		.then(function(user) {
 			if (!user) {
 				req.flash('error', 'Password reset token is invalid or has expired.');
 				return res.redirect('/forgot');
 			}
-			res.render('reset', { user: req.user });
+			res.render('reset', { token: req.params.token });
+		})
+		.catch(function(err) {
+			console.log(err);
+			return tools.failRequest(req, res, "Internal Error: Unable to search database");
 		});
 	});
 
 	app.post('/resetpassword', function(req, res, next) {
 		function findUser(token) {
-			User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }).exec()
+			User.findOne({ resetPasswordToken: req.body.token }).exec()
 			.then(function(user) {
 				req.assert('password', 'Passwords must match').equals(req.body.reentered);
 				req.assert('password', 'Passwords must be at least 6 characters long').isLength({min: 6, max: undefined});
@@ -154,10 +173,9 @@ module.exports = function(app) {
 				} else if(errors) {
 					tools.failRequest(req, res, errors);
 				} else {
-					user.password = req.body.password;
+					user.password = user.generateHash(req.body.password);
 					user.changedat = Date.now();
 					user.resetPasswordToken = undefined;
-					user.resetPasswordExpires = undefined;
 
 					user.save(function(err) {
 						if(err) handleError(err);
@@ -173,17 +191,18 @@ module.exports = function(app) {
 		}
 
 		function sendMail(user) {
-			var smtpTransport = nodemailer.createTransport('SMTP', {
-				service: 'Mailgun',
+			var auth = {
 				auth: {
-					user: 'postmaster@sandbox92d0ac14949744d6b790ead9cfaf6eca.mailgun.org',
-					pass: 'c79e89becaad90491054247a711cc1db'
+					api_key: 'key-1a89c47c55776e7eabdf99f6b6551127',
+					domain: 'continuity.loud.red'
 				}
-			});
+			};
+
+			var smtpTransport = nodemailer.createTransport(mg(auth));
 			var mailOptions = {
 				to: user.email,
-				from: 'noreply@loud.red',
-				subject: 'Continuity Password Reset',
+				from: 'noreply@continuity.loud.red',
+				subject: 'Successfully Reset Password',
 				text: 'Hello,\n\n' +
 				'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
 			};

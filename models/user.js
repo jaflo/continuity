@@ -42,10 +42,8 @@ var userSchema = mongoose.Schema({
         minlength: 6
     },
 	resetPasswordToken: {
-		type: String
-	},
-	resetPasswordExpires: {
-		type: Date
+		type: String,
+		expires: 60*60
 	},
     createdat: {
         type: Date,
