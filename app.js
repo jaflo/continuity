@@ -135,7 +135,7 @@ Story.collection.count({}, function(err, count) {
 			shortID: '00000',
 			parent: "this should never be a valid parent. kind of a hack", // [TODO] check if exists
 			author: 'Hatchling',
-			content: 'This is the parent story of all parents.', // [TODO] validate
+			content: 'Ever wanted a story to have an alternate ending? Or wanted to add a plot twist of your own? Read through a story one piece at a time, pick your own path or create your own!', // [TODO] validate
 			createdat: Date.now(),
 			changedat: Date.now()
 		});
