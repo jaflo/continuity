@@ -33,6 +33,11 @@ $(document).ready(function() {
 
 	if (typeof loadedRecaptcha != "undefined" && loadedRecaptcha) $("form.large button").removeAttr("disabled");
 
+	$("form.large").submit(function(e) {
+		if ($(this).find("button").attr("disabled")) e.preventDefault();
+		else if (!$(this).is("#login, #signup")) $(this).find("button").attr("disabled", "disabled");
+	});
+
 	$("#login, #signup").submit(function(e) {
 		if ($(this).find("button").attr("disabled")) {
 			e.preventDefault();
